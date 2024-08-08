@@ -29,6 +29,5 @@
   "scripts": {
     "start": "nodemon index.js",
     "postinstall": "npm rebuild bcrypt --build-from-source"
-
   }
 }
