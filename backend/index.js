@@ -14,13 +14,13 @@ const estoqueRoutes = require('./estoque/estoqueRoute');
 
 const app = express();
 
-const corsOrigins = process.env.CORS_ORIGIN.split(',');
 
 app.use(cors({
-  origin: corsOrigins,
+  origin: ['http://localhost:3000', 'https://animescrud.netlify.app', 'https://animes-crud.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 
 connectDB();
 
