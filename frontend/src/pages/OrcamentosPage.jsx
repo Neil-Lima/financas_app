@@ -130,7 +130,7 @@ const OrcamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:5000/api/orcamentos?mes=${newOrcamento.mes}&ano=${newOrcamento.ano}`,
+        `https://financas-app-kappa.vercel.app/api/orcamentos?mes=${newOrcamento.mes}&ano=${newOrcamento.ano}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -144,7 +144,7 @@ const OrcamentosPage = () => {
   const fetchCategorias = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/categorias", {
+      const response = await axios.get("https://financas-app-kappa.vercel.app/api/categorias", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategorias(response.data);
@@ -162,7 +162,7 @@ const OrcamentosPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/orcamentos", newOrcamento, {
+      await axios.post("https://financas-app-kappa.vercel.app/api/orcamentos", newOrcamento, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNewOrcamento({
@@ -191,7 +191,7 @@ const OrcamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/orcamentos/${editingId}`,
+        `https://financas-app-kappa.vercel.app/api/orcamentos/${editingId}`,
         editedOrcamento,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -208,7 +208,7 @@ const OrcamentosPage = () => {
     if (window.confirm("Tem certeza que deseja excluir este orçamento?")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/api/orcamentos/${id}`, {
+        await axios.delete(`https://financas-app-kappa.vercel.app/api/orcamentos/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchOrcamentos();

@@ -38,7 +38,7 @@ const UsuariosPage = () => {
   const fetchUsuarios = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/usuarios', {
+      const response = await axios.get('https://financas-app-kappa.vercel.app/api/usuarios', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsuarios(response.data);
@@ -50,7 +50,7 @@ const UsuariosPage = () => {
   const deleteUsuario = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/api/usuarios/${id}`, {
+      await axios.delete(`https://financas-app-kappa.vercel.app/api/usuarios/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchUsuarios();
@@ -62,7 +62,7 @@ const UsuariosPage = () => {
   const deleteAllUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete('http://localhost:5000/api/usuarios/deleteAll', {
+      await axios.delete('https://financas-app-kappa.vercel.app/api/usuarios/deleteAll', {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchUsuarios();
