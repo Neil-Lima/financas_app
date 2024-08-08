@@ -1,49 +1,22 @@
-import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Form,
-  Table,
-  Alert,
-  Modal,
-} from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Button, Form, Table, Alert, Modal } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
   faPlus,
   faEdit,
   faTrash,
   faCheck,
   faTimes,
-  faEye,
-} from "@fortawesome/free-solid-svg-icons";
-import styled from "styled-components";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-import Layout from "../layout/Layout";
-import axios from "axios";
-import { useTheme } from "../context/ThemeContext";
+  faEye
+} from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
+import Layout from '../layout/Layout';
+import axios from 'axios';
+import { useTheme } from '../context/ThemeContext';
 
-ChartJS.register(
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const StyledContainer = styled(Container)`
   padding: 20px;
@@ -53,8 +26,8 @@ const StyledCard = styled(Card)`
   border: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  background-color: ${(props) => (props.isDarkMode ? "#2c2c2c" : "#ffffff")};
-  color: ${(props) => (props.isDarkMode ? "#ffffff" : "#000000")};
+  background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
+  color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
   margin-bottom: 20px;
 
   &:hover {
@@ -72,7 +45,7 @@ const ChartContainer = styled.div`
 `;
 
 const StyledTable = styled(Table)`
-  color: ${(props) => (props.isDarkMode ? "#ffffff" : "#000000")};
+  color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
   @media (max-width: 768px) {
     font-size: 0.8rem;
   }
@@ -100,8 +73,8 @@ const ResponsiveForm = styled(Form)`
 
 const StyledModal = styled(Modal)`
   .modal-content {
-    background-color: ${(props) => (props.isDarkMode ? "#2c2c2c" : "#ffffff")};
-    color: ${(props) => (props.isDarkMode ? "#ffffff" : "#000000")};
+    background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
+    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
   }
 `;
 
@@ -110,8 +83,8 @@ const OrcamentosPage = () => {
   const [orcamentos, setOrcamentos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [newOrcamento, setNewOrcamento] = useState({
-    categoria: "",
-    valor_planejado: "",
+    categoria: '',
+    valor_planejado: '',
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
   });
@@ -120,6 +93,7 @@ const OrcamentosPage = () => {
   const [editedOrcamento, setEditedOrcamento] = useState({});
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsOrcamento, setDetailsOrcamento] = useState(null);
+  const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
 
   useEffect(() => {
     fetchOrcamentos();
@@ -128,28 +102,30 @@ const OrcamentosPage = () => {
 
   const fetchOrcamentos = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       const response = await axios.get(
-        `https://financas-app-kappa.vercel.app/api/orcamentos?mes=${newOrcamento.mes}&ano=${newOrcamento.ano}`,
+        `https://financasappproject.netlify.app/api/orcamentos?mes=${newOrcamento.mes}&ano=${newOrcamento.ano}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       setOrcamentos(response.data);
     } catch (error) {
-      console.error("Erro ao buscar orçamentos:", error);
+      console.error('Erro ao buscar orçamentos:', error);
+      showAlert('Erro ao buscar orçamentos', 'danger');
     }
   };
 
   const fetchCategorias = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://financas-app-kappa.vercel.app/api/categorias", {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('https://financasappproject.netlify.app/api/categorias', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategorias(response.data);
     } catch (error) {
-      console.error("Erro ao buscar categorias:", error);
+      console.error('Erro ao buscar categorias:', error);
+      showAlert('Erro ao buscar categorias', 'danger');
     }
   };
 
@@ -161,19 +137,21 @@ const OrcamentosPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      await axios.post("https://financas-app-kappa.vercel.app/api/orcamentos", newOrcamento, {
+      const token = localStorage.getItem('token');
+      await axios.post('https://financasappproject.netlify.app/api/orcamentos', newOrcamento, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNewOrcamento({
-        categoria: "",
-        valor_planejado: "",
+        categoria: '',
+        valor_planejado: '',
         mes: new Date().getMonth() + 1,
         ano: new Date().getFullYear(),
       });
+      showAlert('Orçamento adicionado com sucesso', 'success');
       fetchOrcamentos();
     } catch (error) {
-      console.error("Erro ao adicionar orçamento:", error);
+      console.error('Erro ao adicionar orçamento:', error);
+      showAlert('Falha ao adicionar orçamento', 'danger');
     }
   };
 
@@ -189,31 +167,35 @@ const OrcamentosPage = () => {
 
   const handleSaveEdit = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       await axios.put(
-        `https://financas-app-kappa.vercel.app/api/orcamentos/${editingId}`,
+        `https://financasappproject.netlify.app/api/orcamentos/${editingId}`,
         editedOrcamento,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       setEditingId(null);
+      showAlert('Orçamento atualizado com sucesso', 'success');
       fetchOrcamentos();
     } catch (error) {
-      console.error("Erro ao editar orçamento:", error);
+      console.error('Erro ao editar orçamento:', error);
+      showAlert('Falha ao atualizar orçamento', 'danger');
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Tem certeza que deseja excluir este orçamento?")) {
+    if (window.confirm('Tem certeza que deseja excluir este orçamento?')) {
       try {
-        const token = localStorage.getItem("token");
-        await axios.delete(`https://financas-app-kappa.vercel.app/api/orcamentos/${id}`, {
+        const token = localStorage.getItem('token');
+        await axios.delete(`https://financasappproject.netlify.app/api/orcamentos/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        showAlert('Orçamento excluído com sucesso', 'success');
         fetchOrcamentos();
       } catch (error) {
-        console.error("Erro ao deletar orçamento:", error);
+        console.error('Erro ao deletar orçamento:', error);
+        showAlert('Falha ao excluir orçamento', 'danger');
       }
     }
   };
@@ -221,6 +203,11 @@ const OrcamentosPage = () => {
   const handleShowDetails = (orcamento) => {
     setDetailsOrcamento(orcamento);
     setShowDetailsModal(true);
+  };
+
+  const showAlert = (message, variant) => {
+    setAlert({ show: true, message, variant });
+    setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
   };
 
   useEffect(() => {
@@ -239,14 +226,14 @@ const OrcamentosPage = () => {
     labels: orcamentos.map((orcamento) => orcamento.categoria.nome),
     datasets: [
       {
-        label: "Planejado",
+        label: 'Planejado',
         data: orcamentos.map((orcamento) => orcamento.valor_planejado),
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
       },
       {
-        label: "Atual",
+        label: 'Atual',
         data: orcamentos.map((orcamento) => orcamento.valor_atual),
-        backgroundColor: "rgba(255, 99, 132, 0.6)",
+        backgroundColor: 'rgba(255, 99, 132, 0.6)',
       },
     ],
   };
@@ -258,26 +245,26 @@ const OrcamentosPage = () => {
       y: {
         beginAtZero: true,
         ticks: {
-          color: isDarkMode ? "#ffffff" : "#000000",
+          color: isDarkMode ? '#ffffff' : '#000000',
         },
       },
       x: {
         ticks: {
-          color: isDarkMode ? "#ffffff" : "#000000",
+          color: isDarkMode ? '#ffffff' : '#000000',
         },
       },
     },
     plugins: {
       legend: {
-        position: "top",
+        position: 'top',
         labels: {
-          color: isDarkMode ? "#ffffff" : "#000000",
+          color: isDarkMode ? '#ffffff' : '#000000',
         },
       },
       title: {
         display: true,
-        text: "Orçamento Planejado vs Atual",
-        color: isDarkMode ? "#ffffff" : "#000000",
+        text: 'Orçamento Planejado vs Atual',
+        color: isDarkMode ? '#ffffff' : '#000000',
       },
     },
   };
@@ -285,6 +272,12 @@ const OrcamentosPage = () => {
   return (
     <Layout>
       <StyledContainer fluid>
+        {alert.show && (
+          <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
+            {alert.message}
+          </Alert>
+        )}
+
         <Row className="mb-4">
           <Col>
             <h2>Orçamentos</h2>
