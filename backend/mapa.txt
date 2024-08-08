@@ -1,0 +1,169 @@
+
+.env
+
+Usuário
+
+id (PK)
+nome
+email
+senha
+created_at
+Conta
+
+id (PK)
+usuario_id (FK -> Usuário)
+nome
+saldo
+tipo
+Categoria
+
+id (PK)
+nome
+tipo
+subtipo
+Transação
+
+id (PK)
+conta_id (FK -> Conta)
+categoria_id (FK -> Categoria)
+descricao
+valor
+data
+tipo (receita/despesa)
+Orçamento
+
+id (PK)
+usuario_id (FK -> Usuário)
+categoria_id (FK -> Categoria)
+valor_planejado
+valor_atual
+mes
+ano
+Meta
+
+id (PK)
+usuario_id (FK -> Usuário)
+descricao
+valor_alvo
+valor_atual
+data_limite
+concluida
+Financiamento
+
+id (PK)
+usuario_id (FK -> Usuário)
+descricao
+valor_total
+taxa_juros
+parcelas_totais
+data_inicio
+Parcelamento
+
+id (PK)
+usuario_id (FK -> Usuário)
+descricao
+valor_total
+numero_parcelas
+data_inicio
+Produto (Estoque)
+
+id (PK)
+categoria_id (FK -> Categoria)
+nome
+quantidade
+preco_unitario
+
+
+
+backend/
+├── config/
+│   └── database.js
+├── auth/│   
+    ├── auth.js
+├── middleware/
+│   ├──Middleware.js
+├── usuarios/
+│   ├── usuarioModel.js
+│   ├── usuarioController.js
+│   ├── usuarioService.js
+│   └── usuarioRoute.js
+├── contas/
+│   ├── contaModel.js
+│   ├── contaController.js
+│   ├── contaService.js
+│   └── contaRoute.js
+├── transacoes/
+│   ├── transacaoModel.js
+│   ├── transacaoController.js
+│   ├── transacaoService.js
+│   └── transacaoRoute.js
+├── categorias/
+│   ├── categoriaModel.js
+│   ├── categoriaController.js
+│   ├── categoriaService.js
+│   └── categoriaRoute.js
+├── orcamentos/
+│   ├── orcamentoModel.js
+│   ├── orcamentoController.js
+│   ├── orcamentoService.js
+│   └── orcamentoRoute.js
+├── metas/
+│   ├── metaModel.js
+│   ├── metaController.js
+│   ├── metaService.js
+│   └── metaRoute.js
+├── despesas/
+│   ├── despesaModel.js
+│   ├── despesaController.js
+│   ├── despesaService.js
+│   └── despesaRoute.js
+├── estoque/
+│   ├── estoqueModel.js
+│   ├── estoqueController.js
+│   ├── estoqueService.js
+│   └── estoqueRoute.js
+├── financiamentos/
+│   ├── financiamentoModel.js
+│   ├── financiamentoController.js
+│   ├── financiamentoService.js
+│   └── financiamentoRoute.js
+├── parcelamentos/
+│   ├── parcelamentoModel.js
+│   ├── parcelamentoController.js
+│   ├── parcelamentoService.js
+│   └── parcelamentoRoute.js
+├── relatorios/
+│   ├── relatorioModel.js
+│   ├── relatorioController.js
+│   ├── relatorioService.js
+│   └── relatorioRoute.js
+├── configuracoes/
+│   ├── configuracaoModel.js
+│   ├── configuracaoController.js
+│   ├── configuracaoService.js
+│   └── configuracaoRoute.js
+├── itensEstoque/
+│   ├── itemEstoqueModel.js
+│   ├── itemEstoqueController.js
+│   ├── itemEstoqueService.js
+│   └── itemEstoqueRoute.js
+├── fornecedores/
+│   ├── fornecedorModel.js
+│   ├── fornecedorController.js
+│   ├── fornecedorService.js
+│   └── fornecedorRoute.js
+├── investimentos/
+│   ├── investimentoModel.js
+│   ├── investimentoController.js
+│   ├── investimentoService.js
+│   └── investimentoRoute.js
+├── .env
+└── index.js
+
+
+
+Usuário: Esta é a tabela central que se relaciona com várias outras, incluindo Conta, Meta, Financiamento, Parcelamento e Orçamento.
+
+Categoria: Esta tabela tem conexões com Transação, Orçamento e Produto (Estoque), tornando-a um ponto de interseção importante para classificação e organização dos dados.
+
+Conta: Embora não se comunique diretamente com todas as outras tabelas, a Conta é fundamental pois está ligada ao Usuário e às Transações, que são operações centrais no sistema.

@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "id": "5fb7",
+      "email": "neil.033@hotmail.com",
+      "password": "madara",
+      "name": "victor"
+    }
+  ],
+  "configuracoes": [],
+  "contas": [],
+  "despesas": [],
+  "estoque": [],
+  "financiamentos": [],
+  "historico": [],
+  "metas": [],
+  "orcamentos": [],
+  "parcelamentos": [],
+  "perfil": [],
+  "relatorios": [],
+  "transacoes": []
+}

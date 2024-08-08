@@ -1,0 +1,42 @@
+# Configurações globais de build
+[build]
+  base = "frontend"
+  publish = "build"  # ou "dist" se você estiver usando Vue.js ou similar
+  command = "npm run build"
+
+# Variáveis de ambiente para o build
+[build.environment]
+  NODE_VERSION = "14"  # Ajuste para a versão do Node.js que você está usando
+
+# Configurações para redirecionamentos e cabeçalhos personalizados
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Cabeçalhos HTTP personalizados
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Configurações de plugins (descomente e ajuste conforme necessário)
+# [[plugins]]
+#   package = "@netlify/plugin-nextjs"
+
+# Configurações específicas para diferentes contextos de deploy
+[context.production]
+  command = "npm run build"
+
+[context.deploy-preview]
+  command = "npm run build:preview"
+
+[context.branch-deploy]
+  command = "npm run build:branch"
+
+# Funções serverless do Netlify (se você estiver usando)
+[functions]
+  directory = "functions"

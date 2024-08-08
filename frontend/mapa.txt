@@ -1,0 +1,311 @@
+
+// tabelas backend 
+
+Aqui está a análise das tabelas e estruturas de dados do backend que eles devem conter, juntamente com seus relacionamentos, em português:
+
+Tabela de Usuários:
+
+Usada por: LoginPage, PerfilPage, ConfiguracoesPage
+Campos: id, nome, email, senha, imagem_perfil, preferencias
+Tabela de Transações:
+
+Usada por: TransacoesPage, HomePage, HistoricoPage, RelatoriosPage
+Campos: id, id_usuario, data, descricao, valor, categoria, tipo (receita/despesa)
+Tabela de Contas:
+
+Usada por: ContasPage, HomePage
+Campos: id, id_usuario, nome, saldo, categoria
+Tabela de Orçamentos:
+
+Usada por: OrcamentosPage, RelatoriosPage
+Campos: id, id_usuario, categoria, valor_planejado, valor_gasto
+Tabela de Metas:
+
+Usada por: MetasPage, HomePage
+Campos: id, id_usuario, descricao, valor_alvo, valor_atual, prazo
+Tabela de Investimentos:
+
+Usada por: HomePage, RelatoriosPage
+Campos: id, id_usuario, tipo, valor, rendimento
+Tabela de Despesas:
+
+Usada por: DespesaPage, HomePage, RelatoriosPage
+Campos: id, id_usuario, descricao, valor, data, categoria
+Tabela de Financiamentos:
+
+Usada por: FinanciamentosPage
+Campos: id, id_usuario, descricao, valor_total, parcelas_restantes, valor_mensal, data_inicio
+Tabela de Parcelamentos:
+
+Usada por: ParcelamentosPage
+Campos: id, id_usuario, descricao, valor_total, parcelas_restantes, valor_mensal, data_inicio
+Tabela de Estoque:
+
+Usada por: EstoquePage
+Campos: id, id_usuario, nome_produto, quantidade, preco_unitario, categoria
+Relacionamentos:
+
+A tabela de Usuários é a tabela central, conectada a todas as outras tabelas via chave estrangeira id_usuario.
+A tabela de Transações está conectada à tabela de Contas (para atualização de saldos).
+A tabela de Orçamentos está conectada à tabela de Transações (para rastrear valores gastos).
+A tabela de Metas pode estar conectada à tabela de Transações (para atualizar o progresso).
+A tabela de Despesas é um subconjunto da tabela de Transações (pode ser combinada ou separada).
+A HomePage e a RelatoriosPage precisarão acessar múltiplas tabelas para coletar e exibir dados financeiros abrangentes.
+
+Esta estrutura permite um sistema abrangente de gerenciamento financeiro, cobrindo vários aspectos das finanças pessoais enquanto mantém relações entre diferentes pontos de dados.
+
+Tabela de Usuários
+
+Campos: id, nome, email, senha, imagem_perfil, preferencias
+Relacionamentos: Conectada a todas as outras tabelas via id_usuario
+Tabela de Transações
+
+Campos: id, id_usuario, data, descricao, valor, categoria, tipo (receita/despesa)
+Relacionamentos: Conectada à tabela de Contas e Usuários
+Tabela de Contas
+
+Campos: id, id_usuario, nome, saldo, categoria
+Relacionamentos: Conectada à tabela de Usuários e Transações
+Tabela de Orçamentos
+
+Campos: id, id_usuario, categoria, valor_planejado, valor_gasto
+Relacionamentos: Conectada à tabela de Usuários e Transações
+Tabela de Metas
+
+Campos: id, id_usuario, descricao, valor_alvo, valor_atual, prazo
+Relacionamentos: Conectada à tabela de Usuários e possivelmente à de Transações
+Tabela de Investimentos
+
+Campos: id, id_usuario, tipo, valor, rendimento
+Relacionamentos: Conectada à tabela de Usuários
+Tabela de Despesas
+
+Campos: id, id_usuario, descricao, valor, data, categoria
+Relacionamentos: Conectada à tabela de Usuários e pode ser um subconjunto de Transações
+Tabela de Financiamentos
+
+Campos: id, id_usuario, descricao, valor_total, parcelas_restantes, valor_mensal, data_inicio
+Relacionamentos: Conectada à tabela de Usuários
+Tabela de Parcelamentos
+
+Campos: id, id_usuario, descricao, valor_total, parcelas_restantes, valor_mensal, data_inicio
+Relacionamentos: Conectada à tabela de Usuários
+Tabela de Estoque
+
+Campos: id, id_usuario, nome_produto, quantidade, preco_unitario, categoria
+Relacionamentos: Conectada à tabela de Usuários
+Este mapa fornece uma visão clara da estrutura do banco de dados e das relações entre as tabelas, facilitando o desenvolvimento do backend da aplicação financeira.
+
+
+src/
+├── config/
+│   └── configuracao.module.ts
+├── middlewares/
+│   └── logging.middleware.ts
+├── usuarios/
+│   ├── dto/
+│   │   ├── criar-usuario.dto.ts
+│   │   └── atualizar-usuario.dto.ts
+│   ├── entities/
+│   │   └── usuario.entity.ts
+│   ├── usuarios.controller.ts
+│   ├── usuarios.module.ts
+│   └── usuarios.service.ts
+├── transacoes/
+│   ├── dto/
+│   │   ├── criar-transacao.dto.ts
+│   │   └── atualizar-transacao.dto.ts
+│   ├── entities/
+│   │   └── transacao.entity.ts
+│   ├── transacoes.controller.ts
+│   ├── transacoes.module.ts
+│   └── transacoes.service.ts
+├── contas/
+│   ├── dto/
+│   │   ├── criar-conta.dto.ts
+│   │   └── atualizar-conta.dto.ts
+│   ├── entities/
+│   │   └── conta.entity.ts
+│   ├── contas.controller.ts
+│   ├── contas.module.ts
+│   └── contas.service.ts
+├── orcamentos/
+│   ├── dto/
+│   │   ├── criar-orcamento.dto.ts
+│   │   └── atualizar-orcamento.dto.ts
+│   ├── entities/
+│   │   └── orcamento.entity.ts
+│   ├── orcamentos.controller.ts
+│   ├── orcamentos.module.ts
+│   └── orcamentos.service.ts
+├── metas/
+│   ├── dto/
+│   │   ├── criar-meta.dto.ts
+│   │   └── atualizar-meta.dto.ts
+│   ├── entities/
+│   │   └── meta.entity.ts
+│   ├── metas.controller.ts
+│   ├── metas.module.ts
+│   └── metas.service.ts
+├── investimentos/
+│   ├── dto/
+│   │   ├── criar-investimento.dto.ts
+│   │   └── atualizar-investimento.dto.ts
+│   ├── entities/
+│   │   └── investimento.entity.ts
+│   ├── investimentos.controller.ts
+│   ├── investimentos.module.ts
+│   └── investimentos.service.ts
+├── despesas/
+│   ├── dto/
+│   │   ├── criar-despesa.dto.ts
+│   │   └── atualizar-despesa.dto.ts
+│   ├── entities/
+│   │   └── despesa.entity.ts
+│   ├── despesas.controller.ts
+│   ├── despesas.module.ts
+│   └── despesas.service.ts
+├── financiamentos/
+│   ├── dto/
+│   │   ├── criar-financiamento.dto.ts
+│   │   └── atualizar-financiamento.dto.ts
+│   ├── entities/
+│   │   └── financiamento.entity.ts
+│   ├── financiamentos.controller.ts
+│   ├── financiamentos.module.ts
+│   └── financiamentos.service.ts
+├── parcelamentos/
+│   ├── dto/
+│   │   ├── criar-parcelamento.dto.ts
+│   │   └── atualizar-parcelamento.dto.ts
+│   ├── entities/
+│   │   └── parcelamento.entity.ts
+│   ├── parcelamentos.controller.ts
+│   ├── parcelamentos.module.ts
+│   └── parcelamentos.service.ts
+├── estoque/
+│   ├── dto/
+│   │   ├── criar-estoque.dto.ts
+│   │   └── atualizar-estoque.dto.ts
+│   ├── entities/
+│   │   └── estoque.entity.ts
+│   ├── estoque.controller.ts
+│   ├── estoque.module.ts
+│   └── estoque.service.ts
+├── auth/
+│   ├── auth.module.ts
+│   ├── auth.service.ts
+│   ├── jwt.strategy.ts
+│   └── local.strategy.ts
+└── app.module.ts
+
+
+
++-----------------+
+|    Usuários     |
++-----------------+
+| id (PK)         |
+| nome            |
+| email           |
+| senha           |
+| imagem_perfil   |
+| preferencias    |
++-----------------+
+       | 1
+       |
+       |
+       | N
++-----------------+          +-----------------+
+|   Transações    |          |    Contas       |
++-----------------+          +-----------------+
+| id (PK)         |          | id (PK)         |
+| id_usuario (FK) | <------> | id_usuario (FK) |
+| data            |          | nome            |
+| descricao       |          | saldo           |
+| valor           |          | categoria       |
+| categoria       |          +-----------------+
+| tipo            |
++-----------------+
+       | 1
+       |
+       | N
++-----------------+
+|   Orçamentos    |
++-----------------+
+| id (PK)         |
+| id_usuario (FK) |
+| categoria       |
+| valor_planejado |
+| valor_gasto     |
++-----------------+
+       | 1
+       |
+       | N
++-----------------+          +-----------------+
+|     Metas       |          |   Investimentos |
++-----------------+          +-----------------+
+| id (PK)         |          | id (PK)         |
+| id_usuario (FK) |          | id_usuario (FK) |
+| descricao       |          | tipo            |
+| valor_alvo      |          | valor           |
+| valor_atual     |          | rendimento      |
+| prazo           |          +-----------------+
++-----------------+
+       |
+       | N
+       |
+       | 1
++-----------------+
+|   Despesas      |
++-----------------+
+| id (PK)         |
+| id_usuario (FK) |
+| descricao       |
+| valor           |
+| data            |
+| categoria       |
++-----------------+
+       |
+       | 1
+       |
+       | N
++-----------------+
+|  Financiamentos |
++-----------------+
+| id (PK)         |
+| id_usuario (FK) |
+| descricao       |
+| valor_total     |
+| parcelas_restantes |
+| valor_mensal    |
+| data_inicio     |
++-----------------+
+       |
+       | 1
+       |
+       | N
++-----------------+
+|  Parcelamentos  |
++-----------------+
+| id (PK)         |
+| id_usuario (FK) |
+| descricao       |
+| valor_total     |
+| parcelas_restantes |
+| valor_mensal    |
+| data_inicio     |
++-----------------+
+       |
+       | 1
+       |
+       | N
++-----------------+
+|    Estoque      |
++-----------------+
+| id (PK)         |
+| id_usuario (FK) |
+| nome_produto    |
+| quantidade      |
+| preco_unitario  |
+| categoria       |
++-----------------+
