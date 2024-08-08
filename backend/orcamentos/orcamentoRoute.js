@@ -1,4 +1,3 @@
-// orcamentoRoute.js
 const express = require('express');
 const router = express.Router();
 const orcamentoController = require('./orcamentoController');
@@ -10,5 +9,6 @@ router.get('/', orcamentoController.listarOrcamentos);
 router.post('/', orcamentoController.criarOrcamento);
 router.put('/:id', orcamentoController.atualizarOrcamento);
 router.delete('/:id', orcamentoController.deletarOrcamento);
+router.get('/comparar-anual', orcamentoController.compararOrcamentosAnuais);
 
 module.exports = router;

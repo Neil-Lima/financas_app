@@ -1,5 +1,11 @@
-// orcamentoModel.js
 const mongoose = require('mongoose');
+
+const alteracaoSchema = new mongoose.Schema({
+  data: { type: Date, default: Date.now },
+  campo: String,
+  valorAntigo: mongoose.Schema.Types.Mixed,
+  valorNovo: mongoose.Schema.Types.Mixed
+});
 
 const orcamentoSchema = new mongoose.Schema({
   usuario: {
@@ -21,6 +27,13 @@ const orcamentoSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
+  valor_restante: {
+    type: Number,
+    required: true,
+    default: function() {
+      return this.valor_planejado - this.valor_atual;
+    }
+  },
   mes: {
     type: Number,
     required: true,
@@ -29,6 +42,26 @@ const orcamentoSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  notas: {
+    type: String,
+    default: ''
+  },
+  recorrencia: {
+    type: String,
+    enum: ['mensal', 'trimestral', 'anual', 'nao_recorrente'],
+    default: 'nao_recorrente'
+  },
+  prioridade: {
+    type: Number,
+    min: 1,
+    max: 5,
+    default: 3
+  },
+  historicoAlteracoes: [alteracaoSchema],
+  metaEconomia: {
+    type: Number,
+    default: 0
+  }
 });
 
 module.exports = mongoose.model('Orcamento', orcamentoSchema);

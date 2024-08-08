@@ -18,6 +18,7 @@ import {
   faCheck,
   faTimes,
   faEye,
+  faHistory,
 } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import {
@@ -112,8 +113,14 @@ const OrcamentosPage = () => {
   const [newOrcamento, setNewOrcamento] = useState({
     categoria: "",
     valor_planejado: "",
+    valor_atual: 0,
+    valor_restante: 0,
     mes: new Date().getMonth() + 1,
     ano: new Date().getFullYear(),
+    notas: "",
+    recorrencia: "nao_recorrente",
+    prioridade: 3,
+    metaEconomia: 0,
   });
   const [alerts, setAlerts] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -121,6 +128,9 @@ const OrcamentosPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsOrcamento, setDetailsOrcamento] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
+  const [showHistoricoModal, setShowHistoricoModal] = useState(false);
+  const [historicoOrcamento, setHistoricoOrcamento] = useState([]);
+  const [comparacaoAnual, setComparacaoAnual] = useState(null);
 
   useEffect(() => {
     fetchOrcamentos();
@@ -131,7 +141,7 @@ const OrcamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://financas-app-kappa.vercel.app/api/orcamentos?mes=${newOrcamento.mes}&ano=${newOrcamento.ano}`,
+        `https://financas-app-kappa.vercel.app/api/orcamentos?ano=${newOrcamento.ano}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -171,8 +181,14 @@ const OrcamentosPage = () => {
       setNewOrcamento({
         categoria: "",
         valor_planejado: "",
+        valor_atual: 0,
+        valor_restante: 0,
         mes: new Date().getMonth() + 1,
         ano: new Date().getFullYear(),
+        notas: "",
+        recorrencia: "nao_recorrente",
+        prioridade: 3,
+        metaEconomia: 0,
       });
       fetchOrcamentos();
       showAlert('Orçamento adicionado com sucesso', 'success');
@@ -232,9 +248,32 @@ const OrcamentosPage = () => {
     setShowDetailsModal(true);
   };
 
+  const handleShowHistorico = (orcamento) => {
+    setHistoricoOrcamento(orcamento.historicoAlteracoes);
+    setShowHistoricoModal(true);
+  };
+
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
     setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
+  };
+
+  const handleCompararAnual = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const anoAtual = new Date().getFullYear();
+      const anoAnterior = anoAtual - 1;
+      const response = await axios.get(
+        `https://financas-app-kappa.vercel.app/api/orcamentos/comparar-anual?anoAtual=${anoAtual}&anoAnterior=${anoAnterior}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setComparacaoAnual(response.data);
+    } catch (error) {
+      console.error("Erro ao comparar orçamentos anuais:", error);
+      showAlert('Falha ao comparar orçamentos anuais', 'danger');
+    }
   };
 
   useEffect(() => {
@@ -392,6 +431,57 @@ const OrcamentosPage = () => {
                         />
                       </Form.Group>
                     </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={3}>
+                      <Form.Group>
+                        <Form.Label>Notas</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          name="notas"
+                          value={newOrcamento.notas}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Group>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={3}>
+                      <Form.Group>
+                        <Form.Label>Recorrência</Form.Label>
+                        <Form.Control
+                          as="select"
+                          name="recorrencia"
+                          value={newOrcamento.recorrencia}
+                          onChange={handleInputChange}
+                        >
+                          <option value="nao_recorrente">Não Recorrente</option>
+                          <option value="mensal">Mensal</option>
+                          <option value="trimestral">Trimestral</option>
+                          <option value="anual">Anual</option>
+                        </Form.Control>
+                      </Form.Group>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={3}>
+                      <Form.Group>
+                        <Form.Label>Prioridade</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="prioridade"
+                          value={newOrcamento.prioridade}
+                          onChange={handleInputChange}
+                          min="1"
+                          max="5"
+                        />
+                      </Form.Group>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={3}>
+                      <Form.Group>
+                        <Form.Label>Meta de Economia</Form.Label>
+                        <Form.Control
+                          type="number"
+                          name="metaEconomia"
+                          value={newOrcamento.metaEconomia}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Group>
+                    </ResponsiveCol>
                   </Row>
                   <ResponsiveButton
                     variant="primary"
@@ -420,6 +510,46 @@ const OrcamentosPage = () => {
           </Col>
         </Row>
 
+        <Row className="mb-4">
+          <Col>
+            <ResponsiveButton variant="info" onClick={handleCompararAnual}>
+              Comparar com Ano Anterior
+            </ResponsiveButton>
+          </Col>
+        </Row>
+
+        {comparacaoAnual && (
+          <Row className="mb-4">
+            <Col>
+              <StyledCard isDarkMode={isDarkMode}>
+                <Card.Body>
+                  <Card.Title>Comparação Anual</Card.Title>
+                  <Table striped bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>Categoria</th>
+                        <th>Ano Anterior</th>
+                        <th>Ano Atual</th>
+                        <th>Diferença</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(comparacaoAnual).map(([categoria, { anterior, atual }]) => (
+                        <tr key={categoria}>
+                          <td>{categoria}</td>
+                          <td>R$ {anterior.toFixed(2)}</td>
+                          <td>R$ {atual.toFixed(2)}</td>
+                          <td>R$ {(atual - anterior).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Card.Body>
+              </StyledCard>
+            </Col>
+          </Row>
+        )}
+
         <Row>
           <Col>
             <StyledCard isDarkMode={isDarkMode}>
@@ -438,6 +568,9 @@ const OrcamentosPage = () => {
                         <th>Atual</th>
                         <th>Restante</th>
                         <th>Progresso</th>
+                        <th>Recorrência</th>
+                        <th>Prioridade</th>
+                        <th>Meta de Economia</th>
                         <th>Ações</th>
                       </tr>
                     </thead>
@@ -478,12 +611,7 @@ const OrcamentosPage = () => {
                             )}
                           </td>
                           <td>R$ {orcamento.valor_atual.toFixed(2)}</td>
-                          <td>
-                            R${" "}
-                            {(
-                              orcamento.valor_planejado - orcamento.valor_atual
-                            ).toFixed(2)}
-                          </td>
+                          <td>R$ {orcamento.valor_restante.toFixed(2)}</td>
                           <td>
                             <div className="progress">
                               <div
@@ -518,6 +646,9 @@ const OrcamentosPage = () => {
                               </div>
                             </div>
                           </td>
+                          <td>{orcamento.recorrencia}</td>
+                          <td>{orcamento.prioridade}</td>
+                          <td>R$ {orcamento.metaEconomia.toFixed(2)}</td>
                           <td>
                             {editingId === orcamento._id ? (
                               <>
@@ -560,6 +691,13 @@ const OrcamentosPage = () => {
                                 >
                                   <FontAwesomeIcon icon={faEye} />
                                 </ResponsiveButton>
+                                <ResponsiveButton
+                                  variant="outline-secondary"
+                                  size="sm"
+                                  onClick={() => handleShowHistorico(orcamento)}
+                                >
+                                  <FontAwesomeIcon icon={faHistory} />
+                                </ResponsiveButton>
                               </>
                             )}
                           </td>
@@ -584,31 +722,63 @@ const OrcamentosPage = () => {
           <Modal.Body>
             {detailsOrcamento && (
               <>
-                <p>
-                  <strong>Categoria:</strong> {detailsOrcamento.categoria.nome}
-                </p>
-                <p>
-                  <strong>Valor Planejado:</strong> R${" "}
-                  {detailsOrcamento.valor_planejado.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Valor Atual:</strong> R${" "}
-                  {detailsOrcamento.valor_atual.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Mês:</strong> {detailsOrcamento.mes}
-                </p>
-                <p>
-                  <strong>Ano:</strong> {detailsOrcamento.ano}
-                </p>
-                <p>
-                  <strong>ID:</strong> {detailsOrcamento._id}
-                </p>
+                <p><strong>Categoria:</strong> {detailsOrcamento.categoria.nome}</p>
+                <p><strong>Valor Planejado:</strong> R$ {detailsOrcamento.valor_planejado.toFixed(2)}</p>
+                <p><strong>Valor Atual:</strong> R$ {detailsOrcamento.valor_atual.toFixed(2)}</p>
+                <p><strong>Valor Restante:</strong> R$ {detailsOrcamento.valor_restante.toFixed(2)}</p>
+                <p><strong>Mês:</strong> {detailsOrcamento.mes}</p>
+                <p><strong>Ano:</strong> {detailsOrcamento.ano}</p>
+                <p><strong>Notas:</strong> {detailsOrcamento.notas}</p>
+                <p><strong>Recorrência:</strong> {detailsOrcamento.recorrencia}</p>
+                <p><strong>Prioridade:</strong> {detailsOrcamento.prioridade}</p>
+                <p><strong>Meta de Economia:</strong> R$ {detailsOrcamento.metaEconomia.toFixed(2)}</p>
+                <p><strong>ID:</strong> {detailsOrcamento._id}</p>
               </>
             )}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>
+              Fechar
+            </Button>
+          </Modal.Footer>
+        </StyledModal>
+
+        <StyledModal
+          show={showHistoricoModal}
+          onHide={() => setShowHistoricoModal(false)}
+          isDarkMode={isDarkMode}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Histórico de Alterações</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {historicoOrcamento.length > 0 ? (
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Campo</th>
+                    <th>Valor Antigo</th>
+                    <th>Valor Novo</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historicoOrcamento.map((alteracao, index) => (
+                    <tr key={index}>
+                      <td>{new Date(alteracao.data).toLocaleString()}</td>
+                      <td>{alteracao.campo}</td>
+                      <td>{alteracao.valorAntigo}</td>
+                      <td>{alteracao.valorNovo}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
+              <p>Nenhuma alteração registrada.</p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowHistoricoModal(false)}>
               Fechar
             </Button>
           </Modal.Footer>
