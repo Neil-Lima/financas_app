@@ -1,5 +1,3 @@
-
-// transacaoModel.js
 const mongoose = require('mongoose');
 
 const transacaoSchema = new mongoose.Schema({
@@ -30,6 +28,11 @@ const transacaoSchema = new mongoose.Schema({
     enum: ['receita', 'despesa'],
     required: true,
   },
-});
+  usuario: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: true,
+  },
+}, { timestamps: true });
 
 module.exports = mongoose.model('Transacao', transacaoSchema);

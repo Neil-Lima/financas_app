@@ -1,11 +1,11 @@
-// transacaoService.js
 const Transacao = require('./transacaoModel');
 const Conta = require('../contas/contaModel');
 
 const listarTransacoes = async (usuarioId) => {
-  return await Transacao.find({ 'conta.usuario': usuarioId })
+  return await Transacao.find({ usuario: usuarioId })
     .populate('conta')
-    .populate('categoria');
+    .populate('categoria')
+    .sort({ data: -1 });
 };
 
 const criarTransacao = async (usuarioId, transacaoData) => {
@@ -13,7 +13,7 @@ const criarTransacao = async (usuarioId, transacaoData) => {
   if (!conta) {
     throw new Error('Conta não encontrada');
   }
-  const transacao = await Transacao.create(transacaoData);
+  const transacao = await Transacao.create({ ...transacaoData, usuario: usuarioId });
   await atualizarSaldoConta(conta, transacao);
   return transacao;
 };

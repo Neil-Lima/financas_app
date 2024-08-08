@@ -1,4 +1,3 @@
-// transacaoController.js
 const transacaoService = require('./transacaoService');
 
 const listarTransacoes = async (req, res) => {

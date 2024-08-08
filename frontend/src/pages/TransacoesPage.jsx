@@ -1,52 +1,11 @@
-import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Form,
-  Table,
-  Modal,
-  Alert,
-} from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-  faEdit,
-  faTrash,
-  faFileImport,
-  faCheck,
-  faTimes,
-  faSearch,
-  faSort,
-  faSortUp,
-  faSortDown,
-  faEye,
-} from "@fortawesome/free-solid-svg-icons";
-import styled from "styled-components";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-import Layout from "../layout/Layout";
-import axios from "axios";
-import { useTheme } from "../context/ThemeContext";
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Card, Button, Form, Table, Modal, Alert } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faEdit, faTrash, faCheck, faTimes, faEye } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components';
+import Layout from '../layout/Layout';
+import axios from 'axios';
+import { useTheme } from '../context/ThemeContext';
 
 const StyledContainer = styled(Container)`
   padding: 20px;
@@ -56,8 +15,8 @@ const StyledCard = styled(Card)`
   border: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  background-color: ${(props) => (props.isDarkMode ? "#2c2c2c" : "#ffffff")};
-  color: ${(props) => (props.isDarkMode ? "#ffffff" : "#000000")};
+  background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
+  color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
   margin-bottom: 20px;
 
   &:hover {
@@ -66,16 +25,9 @@ const StyledCard = styled(Card)`
   }
 `;
 
-const ChartContainer = styled.div`
-  height: 300px;
-  width: 100%;
-  @media (max-width: 768px) {
-    height: 200px;
-  }
-`;
-
 const StyledTable = styled(Table)`
-  color: ${(props) => (props.isDarkMode ? "#ffffff" : "#000000")};
+  color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
+  
   @media (max-width: 768px) {
     font-size: 0.8rem;
   }
@@ -85,24 +37,27 @@ const ResponsiveButton = styled(Button)`
   @media (max-width: 768px) {
     font-size: 0.8rem;
     padding: 0.25rem 0.5rem;
+    margin: 0.2rem;
   }
 `;
 
 const StyledModal = styled(Modal)`
   .modal-content {
-    background-color: ${(props) => (props.isDarkMode ? "#2c2c2c" : "#ffffff")};
-    color: ${(props) => (props.isDarkMode ? "#ffffff" : "#000000")};
+    background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
+    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
   }
 `;
 
-const SearchInput = styled(Form.Control)`
-  max-width: 300px;
-  margin-bottom: 20px;
+const ResponsiveCol = styled(Col)`
+  @media (max-width: 768px) {
+    margin-bottom: 1rem;
+  }
 `;
 
-const SortIcon = styled(FontAwesomeIcon)`
-  cursor: pointer;
-  margin-left: 5px;
+const ResponsiveForm = styled(Form)`
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const TransacoesPage = () => {
@@ -110,30 +65,19 @@ const TransacoesPage = () => {
   const [transacoes, setTransacoes] = useState([]);
   const [contas, setContas] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [newTransaction, setNewTransaction] = useState({
-    conta: "",
-    categoria: "",
-    descricao: "",
-    valor: "",
-    data: "",
-    tipo: "",
+  const [newTransacao, setNewTransacao] = useState({
+    conta: '',
+    categoria: '',
+    descricao: '',
+    valor: '',
+    data: '',
+    tipo: ''
   });
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importFile, setImportFile] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [editedTransaction, setEditedTransaction] = useState({});
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertVariant, setAlertVariant] = useState("success");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [sortField, setSortField] = useState("data");
-  const [sortDirection, setSortDirection] = useState("desc");
-  const [filter, setFilter] = useState("");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteId, setDeleteId] = useState(null);
+  const [editedTransacao, setEditedTransacao] = useState({});
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [detailsTransaction, setDetailsTransaction] = useState(null);
+  const [detailsTransacao, setDetailsTransacao] = useState(null);
+  const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
 
   useEffect(() => {
     fetchTransacoes();
@@ -143,256 +87,129 @@ const TransacoesPage = () => {
 
   const fetchTransacoes = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://financas-app-kappa.vercel.app/api/transacoes", {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem('token');
+      const response = await axios.get('https://financasappproject.netlify.app/api/transacoes', {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setTransacoes(response.data);
     } catch (error) {
-      console.error("Erro ao buscar transações:", error);
-      showAlertMessage("Erro ao buscar transações", "danger");
+      console.error('Erro ao buscar transações:', error);
+      showAlert('Erro ao buscar transações', 'danger');
     }
   };
 
   const fetchContas = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://financas-app-kappa.vercel.app/api/contas", {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem('token');
+      const response = await axios.get('https://financasappproject.netlify.app/api/contas', {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setContas(response.data);
     } catch (error) {
-      console.error("Erro ao buscar contas:", error);
-      showAlertMessage("Erro ao buscar contas", "danger");
+      console.error('Erro ao buscar contas:', error);
     }
   };
 
   const fetchCategorias = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://financas-app-kappa.vercel.app/api/categorias", {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem('token');
+      const response = await axios.get('https://financasappproject.netlify.app/api/categorias', {
+        headers: { Authorization: `Bearer ${token}` }
       });
       setCategorias(response.data);
     } catch (error) {
-      console.error("Erro ao buscar categorias:", error);
-      showAlertMessage("Erro ao buscar categorias", "danger");
+      console.error('Erro ao buscar categorias:', error);
     }
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewTransaction((prev) => ({ ...prev, [name]: value }));
+    setNewTransacao({ ...newTransacao, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post("https://financas-app-kappa.vercel.app/api/transacoes", newTransaction, {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem('token');
+      await axios.post('https://financasappproject.netlify.app/api/transacoes', newTransacao, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      setTransacoes([...transacoes, response.data]);
-      setNewTransaction({
-        conta: "",
-        categoria: "",
-        descricao: "",
-        valor: "",
-        data: "",
-        tipo: "",
-      });
-      showAlertMessage("Transação adicionada com sucesso", "success");
+      setNewTransacao({ conta: '', categoria: '', descricao: '', valor: '', data: '', tipo: '' });
+      fetchTransacoes();
+      showAlert('Transação adicionada com sucesso', 'success');
     } catch (error) {
-      console.error("Erro ao adicionar transação:", error);
-      showAlertMessage("Erro ao adicionar transação", "danger");
+      console.error('Erro ao adicionar transação:', error);
+      showAlert('Falha ao adicionar transação', 'danger');
     }
   };
 
   const handleEdit = (transacao) => {
     setEditingId(transacao._id);
-    setEditedTransaction(transacao);
+    setEditedTransacao({...transacao, data: new Date(transacao.data).toISOString().split('T')[0]});
   };
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditedTransaction((prev) => ({ ...prev, [name]: value }));
+    setEditedTransacao({ ...editedTransacao, [name]: value });
   };
 
   const handleSaveEdit = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.put(
-        `https://financas-app-kappa.vercel.app/api/transacoes/${editingId}`,
-        editedTransaction,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setTransacoes(transacoes.map(t => t._id === editingId ? response.data : t));
-      setEditingId(null);
-      showAlertMessage("Transação atualizada com sucesso", "success");
-    } catch (error) {
-      console.error("Erro ao editar transação:", error);
-      showAlertMessage("Erro ao editar transação", "danger");
-    }
-  };
-
-  const handleDeleteClick = (id) => {
-    setDeleteId(id);
-    setShowDeleteModal(true);
-  };
-
-  const handleDelete = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`https://financas-app-kappa.vercel.app/api/transacoes/${deleteId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const token = localStorage.getItem('token');
+      await axios.put(`https://financasappproject.netlify.app/api/transacoes/${editingId}`, editedTransacao, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      setTransacoes(transacoes.filter(t => t._id !== deleteId));
-      setShowDeleteModal(false);
-      showAlertMessage("Transação excluída com sucesso", "success");
+      setEditingId(null);
+      fetchTransacoes();
+      showAlert('Transação atualizada com sucesso', 'success');
     } catch (error) {
-      console.error("Erro ao deletar transação:", error);
-      showAlertMessage("Erro ao deletar transação", "danger");
+      console.error('Erro ao editar transação:', error);
+      showAlert('Falha ao atualizar transação', 'danger');
     }
   };
 
-  const handleImportSubmit = async (e) => {
-    e.preventDefault();
-    if (importFile) {
-      const formData = new FormData();
-      formData.append("file", importFile);
+  const handleDelete = async (id) => {
+    if (window.confirm('Tem certeza que deseja excluir esta transação?')) {
       try {
-        const token = localStorage.getItem("token");
-        const response = await axios.post("https://financas-app-kappa.vercel.app/api/transacoes/import", formData, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
+        const token = localStorage.getItem('token');
+        await axios.delete(`https://financasappproject.netlify.app/api/transacoes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        setTransacoes([...transacoes, ...response.data]);
-        setShowImportModal(false);
-        showAlertMessage("Transações importadas com sucesso", "success");
+        fetchTransacoes();
+        showAlert('Transação excluída com sucesso', 'success');
       } catch (error) {
-        console.error("Erro ao importar transações:", error);
-        showAlertMessage("Erro ao importar transações", "danger");
+        console.error('Erro ao deletar transação:', error);
+        showAlert('Falha ao excluir transação', 'danger');
       }
     }
   };
 
-  const showAlertMessage = (message, variant) => {
-    setAlertMessage(message);
-    setAlertVariant(variant);
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 5000);
-  };
-
-  const handleSort = (field) => {
-    if (field === sortField) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const filteredTransactions = transacoes.filter(
-    (transacao) =>
-      transacao.descricao.toLowerCase().includes(filter.toLowerCase()) ||
-      transacao.valor.toString().includes(filter)
-  );
-
-  const sortedTransactions = filteredTransactions.sort((a, b) => {
-    let aValue = a[sortField];
-    let bValue = b[sortField];
-
-    if (sortField === 'categoria.nome') {
-      aValue = a.categoria?.nome || '';
-      bValue = b.categoria?.nome || '';
-    } else if (sortField === 'conta.nome') {
-      aValue = a.conta?.nome || '';
-      bValue = b.conta?.nome || '';
-    }
-
-    if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-    if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
-    return 0;
-  });
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedTransactions.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const chartData = {
-    labels: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"],
-    datasets: [
-      {
-        label: "Receitas",
-        data: [4000, 4200, 4100, 4300, 4000, 4500],
-        backgroundColor: "rgba(75, 192, 192, 0.6)",
-      },
-      {
-        label: "Despesas",
-        data: [3000, 3200, 2800, 3100, 2900, 3300],
-        backgroundColor: "rgba(255, 99, 132, 0.6)",
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          color: isDarkMode ? "#ffffff" : "#000000",
-        },
-      },
-      x: {
-        ticks: {
-          color: isDarkMode ? "#ffffff" : "#000000",
-        },
-      },
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: isDarkMode ? "#ffffff" : "#000000",
-        },
-      },
-      title: {
-        display: true,
-        text: "Visão Geral de Transações",
-        color: isDarkMode ? "#ffffff" : "#000000",
-      },
-    },
-  };
-
   const handleShowDetails = (transacao) => {
-    setDetailsTransaction(transacao);
+    setDetailsTransacao(transacao);
     setShowDetailsModal(true);
+  };
+
+  const showAlert = (message, variant) => {
+    setAlert({ show: true, message, variant });
+    setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
     <Layout>
       <StyledContainer fluid>
-        {showAlert && (
-          <Alert variant={alertVariant} onClose={() => setShowAlert(false)} dismissible>
-            {alertMessage}
+        {alert.show && (
+          <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
+            {alert.message}
           </Alert>
         )}
 
         <Row className="mb-4">
           <Col>
             <h2>Transações</h2>
-          </Col>
-          <Col className="text-right">
-            <ResponsiveButton variant="primary" onClick={() => setShowImportModal(true)}>
-              <FontAwesomeIcon icon={faFileImport} /> Importar Extrato
-            </ResponsiveButton>
           </Col>
         </Row>
 
@@ -401,91 +218,85 @@ const TransacoesPage = () => {
             <StyledCard isDarkMode={isDarkMode}>
               <Card.Body>
                 <Card.Title>Nova Transação</Card.Title>
-                <Form onSubmit={handleSubmit}>
+                <ResponsiveForm onSubmit={handleSubmit}>
                   <Row>
-                    <Col md={3}>
+                    <ResponsiveCol xs={12} md={2}>
                       <Form.Group>
                         <Form.Label>Conta</Form.Label>
                         <Form.Control
                           as="select"
                           name="conta"
-                          value={newTransaction.conta}
+                          value={newTransacao.conta}
                           onChange={handleInputChange}
                           required
                         >
                           <option value="">Selecione uma conta</option>
-                          {contas.map((conta) => (
-                            <option key={conta._id} value={conta._id}>
-                              {conta.nome}
-                            </option>
+                          {contas.map(conta => (
+                            <option key={conta._id} value={conta._id}>{conta.nome}</option>
                           ))}
                         </Form.Control>
                       </Form.Group>
-                    </Col>
-                    <Col md={3}>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={2}>
                       <Form.Group>
                         <Form.Label>Categoria</Form.Label>
                         <Form.Control
                           as="select"
                           name="categoria"
-                          value={newTransaction.categoria}
+                          value={newTransacao.categoria}
                           onChange={handleInputChange}
                           required
                         >
                           <option value="">Selecione uma categoria</option>
-                          {categorias.map((categoria) => (
-                            <option key={categoria._id} value={categoria._id}>
-                              {categoria.nome}
-                            </option>
-                                                   ))}
+                          {categorias.map(categoria => (
+                            <option key={categoria._id} value={categoria._id}>{categoria.nome}</option>
+                          ))}
                         </Form.Control>
                       </Form.Group>
-                    </Col>
-                    <Col md={3}>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={2}>
                       <Form.Group>
                         <Form.Label>Descrição</Form.Label>
                         <Form.Control
                           type="text"
                           name="descricao"
-                          value={newTransaction.descricao}
+                          value={newTransacao.descricao}
                           onChange={handleInputChange}
                           required
                         />
                       </Form.Group>
-                    </Col>
-                    <Col md={3}>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={2}>
                       <Form.Group>
                         <Form.Label>Valor</Form.Label>
                         <Form.Control
                           type="number"
                           name="valor"
-                          value={newTransaction.valor}
+                          value={newTransacao.valor}
                           onChange={handleInputChange}
                           required
                         />
                       </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md={3}>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={2}>
                       <Form.Group>
                         <Form.Label>Data</Form.Label>
                         <Form.Control
                           type="date"
                           name="data"
-                          value={newTransaction.data}
+                          value={newTransacao.data}
                           onChange={handleInputChange}
                           required
                         />
                       </Form.Group>
-                    </Col>
-                    <Col md={3}>
+                    </ResponsiveCol>
+                    <ResponsiveCol xs={12} md={2}>
                       <Form.Group>
                         <Form.Label>Tipo</Form.Label>
                         <Form.Control
                           as="select"
                           name="tipo"
-                          value={newTransaction.tipo}
+                          value={newTransacao.tipo}
                           onChange={handleInputChange}
                           required
                         >
@@ -494,26 +305,13 @@ const TransacoesPage = () => {
                           <option value="despesa">Despesa</option>
                         </Form.Control>
                       </Form.Group>
-                    </Col>
+                    </ResponsiveCol>
                   </Row>
                   <ResponsiveButton variant="primary" type="submit" className="mt-3">
                     <FontAwesomeIcon icon={faPlus} className="mr-2" />
                     Adicionar Transação
                   </ResponsiveButton>
-                </Form>
-              </Card.Body>
-            </StyledCard>
-          </Col>
-        </Row>
-
-        <Row className="mb-4">
-          <Col>
-            <StyledCard isDarkMode={isDarkMode}>
-              <Card.Body>
-                <Card.Title>Visão Geral de Transações</Card.Title>
-                <ChartContainer>
-                  <Bar data={chartData} options={chartOptions} />
-                </ChartContainer>
+                </ResponsiveForm>
               </Card.Body>
             </StyledCard>
           </Col>
@@ -524,82 +322,52 @@ const TransacoesPage = () => {
             <StyledCard isDarkMode={isDarkMode}>
               <Card.Body>
                 <Card.Title>Lista de Transações</Card.Title>
-                <SearchInput 
-                  type="text" 
-                  placeholder="Buscar transações..." 
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value)}
-                />
                 <div className="table-responsive">
-                  <StyledTable
-                    striped
-                    hover
-                    variant={isDarkMode ? "dark" : "light"}
-                    isDarkMode={isDarkMode}
-                  >
+                  <StyledTable striped bordered hover variant={isDarkMode ? 'dark' : 'light'}>
                     <thead>
                       <tr>
-                        <th onClick={() => handleSort('data')}>
-                          Data
-                          <SortIcon 
-                            icon={sortField === 'data' 
-                              ? (sortDirection === 'asc' ? faSortUp : faSortDown) 
-                              : faSort
-                            } 
-                          />
-                        </th>
-                        <th onClick={() => handleSort('descricao')}>
-                          Descrição
-                          <SortIcon 
-                            icon={sortField === 'descricao' 
-                              ? (sortDirection === 'asc' ? faSortUp : faSortDown) 
-                              : faSort
-                            } 
-                          />
-                        </th>
-                        <th onClick={() => handleSort('categoria.nome')}>
-                          Categoria
-                          <SortIcon 
-                            icon={sortField === 'categoria.nome' 
-                              ? (sortDirection === 'asc' ? faSortUp : faSortDown) 
-                              : faSort
-                            } 
-                          />
-                        </th>
-                        <th onClick={() => handleSort('conta.nome')}>
-                          Conta
-                          <SortIcon 
-                            icon={sortField === 'conta.nome' 
-                              ? (sortDirection === 'asc' ? faSortUp : faSortDown) 
-                              : faSort
-                            } 
-                          />
-                        </th>
-                        <th onClick={() => handleSort('valor')}>
-                          Valor
-                          <SortIcon 
-                            icon={sortField === 'valor' 
-                              ? (sortDirection === 'asc' ? faSortUp : faSortDown) 
-                              : faSort
-                            } 
-                          />
-                        </th>
+                        <th>Conta</th>
+                        <th>Categoria</th>
+                        <th>Descrição</th>
+                        <th>Valor</th>
+                        <th>Data</th>
+                        <th>Tipo</th>
                         <th>Ações</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {currentItems.map((transacao) => (
+                      {transacoes.map((transacao) => (
                         <tr key={transacao._id}>
                           <td>
                             {editingId === transacao._id ? (
                               <Form.Control
-                                type="date"
-                                name="data"
-                                value={editedTransaction.data}
+                                as="select"
+                                name="conta"
+                                value={editedTransacao.conta}
                                 onChange={handleEditChange}
-                              />
+                              >
+                                {contas.map(conta => (
+                                  <option key={conta._id} value={conta._id}>{conta.nome}</option>
+                                ))}
+                              </Form.Control>
                             ) : (
-                              new Date(transacao.data).toLocaleDateString()
+                              transacao.conta.nome
+                            )}
+                          </td>
+                          <td>
+                            {editingId === transacao._id ? (
+                              <Form.Control
+                                as="select"
+                                name="categoria"
+                                value={editedTransacao.categoria}
+                                onChange={handleEditChange}
+                              >
+                                {categorias.map(categoria => (
+                                  <option key={categoria._id} value={categoria._id}>{categoria.nome}</option>
+                                ))}
+                              </Form.Control>
+                            ) : (
+                              transacao.categoria.nome
                             )}
                           </td>
                           <td>
@@ -607,7 +375,7 @@ const TransacoesPage = () => {
                               <Form.Control
                                 type="text"
                                 name="descricao"
-                                value={editedTransaction.descricao}
+                                value={editedTransacao.descricao}
                                 onChange={handleEditChange}
                               />
                             ) : (
@@ -617,55 +385,40 @@ const TransacoesPage = () => {
                           <td>
                             {editingId === transacao._id ? (
                               <Form.Control
-                                as="select"
-                                name="categoria"
-                                value={editedTransaction.categoria}
+                                type="number"
+                                name="valor"
+                                value={editedTransacao.valor}
                                 onChange={handleEditChange}
-                              >
-                                {categorias.map((categoria) => (
-                                  <option key={categoria._id} value={categoria._id}>
-                                    {categoria.nome}
-                                  </option>
-                                ))}
-                              </Form.Control>
+                              />
                             ) : (
-                              transacao.categoria?.nome || 'N/A'
+                              `R$ ${transacao.valor.toFixed(2)}`
+                            )}
+                          </td>
+                          <td>
+                            {editingId === transacao._id ? (
+                              <Form.Control
+                                type="date"
+                                name="data"
+                                value={editedTransacao.data}
+                                onChange={handleEditChange}
+                              />
+                            ) : (
+                              formatDate(transacao.data)
                             )}
                           </td>
                           <td>
                             {editingId === transacao._id ? (
                               <Form.Control
                                 as="select"
-                                name="conta"
-                                value={editedTransaction.conta}
+                                name="tipo"
+                                value={editedTransacao.tipo}
                                 onChange={handleEditChange}
                               >
-                                {contas.map((conta) => (
-                                  <option key={conta._id} value={conta._id}>
-                                    {conta.nome}
-                                  </option>
-                                ))}
+                                <option value="receita">Receita</option>
+                                <option value="despesa">Despesa</option>
                               </Form.Control>
                             ) : (
-                              transacao.conta?.nome || 'N/A'
-                            )}
-                          </td>
-                          <td
-                            className={
-                              transacao.tipo === "receita"
-                                ? "text-success"
-                                : "text-danger"
-                            }
-                          >
-                            {editingId === transacao._id ? (
-                              <Form.Control
-                                type="number"
-                                name="valor"
-                                value={editedTransaction.valor}
-                                onChange={handleEditChange}
-                              />
-                            ) : (
-                              `R$ ${Math.abs(transacao.valor).toFixed(2)}`
+                              transacao.tipo
                             )}
                           </td>
                           <td>
@@ -700,7 +453,8 @@ const TransacoesPage = () => {
                                 <ResponsiveButton
                                   variant="outline-danger"
                                   size="sm"
-                                  onClick={() => handleDeleteClick(transacao._id)}
+                                  className="mr-2"
+                                  onClick={() => handleDelete(transacao._id)}
                                 >
                                   <FontAwesomeIcon icon={faTrash} />
                                 </ResponsiveButton>
@@ -719,73 +473,25 @@ const TransacoesPage = () => {
                     </tbody>
                   </StyledTable>
                 </div>
-                <div className="d-flex justify-content-center mt-3">
-                  <ul className="pagination">
-                    {Array.from({ length: Math.ceil(sortedTransactions.length / itemsPerPage) }).map((_, index) => (
-                      <li key={index} className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}>
-                        <button onClick={() => paginate(index + 1)} className="page-link">
-                          {index + 1}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </Card.Body>
             </StyledCard>
           </Col>
         </Row>
-
-        <StyledModal show={showImportModal} onHide={() => setShowImportModal(false)} isDarkMode={isDarkMode}>
-          <Modal.Header closeButton>
-            <Modal.Title>Importar Extrato Bancário</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form onSubmit={handleImportSubmit}>
-              <Form.Group>
-                <Form.Label>Selecione o arquivo do extrato</Form.Label>
-                <Form.Control
-                  type="file"
-                  onChange={(e) => setImportFile(e.target.files[0])}
-                  accept=".csv,.xlsx,.xls"
-                />
-              </Form.Group>
-              <ResponsiveButton variant="primary" type="submit">
-                Importar
-              </ResponsiveButton>
-            </Form>
-          </Modal.Body>
-        </StyledModal>
-
-        <StyledModal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} isDarkMode={isDarkMode}>
-          <Modal.Header closeButton>
-            <Modal.Title>Confirmar Exclusão</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            Tem certeza que deseja excluir esta transação?
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-              Cancelar
-            </Button>
-            <Button variant="danger" onClick={handleDelete}>
-              Excluir
-            </Button>
-          </Modal.Footer>
-        </StyledModal>
 
         <StyledModal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} isDarkMode={isDarkMode}>
           <Modal.Header closeButton>
             <Modal.Title>Detalhes da Transação</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {detailsTransaction && (
+            {detailsTransacao && (
               <>
-                <p><strong>Descrição:</strong> {detailsTransaction.descricao}</p>
-                <p><strong>Valor:</strong> R$ {Math.abs(detailsTransaction.valor).toFixed(2)}</p>
-                <p><strong>Tipo:</strong> {detailsTransaction.tipo}</p>
-                <p><strong>Data:</strong> {new Date(detailsTransaction.data).toLocaleDateString()}</p>
-                <p><strong>Categoria:</strong> {detailsTransaction.categoria?.nome || 'N/A'}</p>
-                <p><strong>Conta:</strong> {detailsTransaction.conta?.nome || 'N/A'}</p>
+                <p><strong>Conta:</strong> {detailsTransacao.conta.nome}</p>
+                <p><strong>Categoria:</strong> {detailsTransacao.categoria.nome}</p>
+                <p><strong>Descrição:</strong> {detailsTransacao.descricao}</p>
+                <p><strong>Valor:</strong> R$ {detailsTransacao.valor.toFixed(2)}</p>
+                <p><strong>Data:</strong> {formatDate(detailsTransacao.data)}</p>
+                <p><strong>Tipo:</strong> {detailsTransacao.tipo}</p>
+                <p><strong>ID:</strong> {detailsTransacao._id}</p>
               </>
             )}
           </Modal.Body>
@@ -801,4 +507,3 @@ const TransacoesPage = () => {
 };
 
 export default TransacoesPage;
-
