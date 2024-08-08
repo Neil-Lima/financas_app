@@ -77,7 +77,7 @@ const ContasPage = () => {
   const fetchContas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financas-app-kappa.vercel.app/api/contas', {
+      const response = await axios.get('https://financasappproject.netlify.app/api/contas', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setContas(response.data);
@@ -96,7 +96,11 @@ const ContasPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://financas-app-kappa.vercel.app/api/contas', newConta, {
+      const formattedData = {
+        ...newConta,
+        data: new Date(newConta.data).toISOString()
+      };
+      await axios.post('https://financasappproject.netlify.app/api/contas', formattedData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewConta({ nome: '', saldo: '', tipo: '', data: '' });
@@ -110,7 +114,7 @@ const ContasPage = () => {
 
   const handleEdit = (conta) => {
     setEditingId(conta._id);
-    setEditedConta(conta);
+    setEditedConta({...conta, data: new Date(conta.data).toISOString().split('T')[0]});
   };
 
   const handleEditChange = (e) => {
@@ -121,7 +125,11 @@ const ContasPage = () => {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://financas-app-kappa.vercel.app/api/contas/${editingId}`, editedConta, {
+      const formattedData = {
+        ...editedConta,
+        data: new Date(editedConta.data).toISOString()
+      };
+      await axios.put(`https://financasappproject.netlify.app/api/contas/${editingId}`, formattedData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -137,7 +145,7 @@ const ContasPage = () => {
     if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financas-app-kappa.vercel.app/api/contas/${id}`, {
+        await axios.delete(`https://financasappproject.netlify.app/api/contas/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchContas();
@@ -157,6 +165,10 @@ const ContasPage = () => {
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
     setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -313,7 +325,7 @@ const ContasPage = () => {
                                 onChange={handleEditChange}
                               />
                             ) : (
-                              new Date(conta.data).toLocaleDateString()
+                              formatDate(conta.data)
                             )}
                           </td>
                           <td>
@@ -383,10 +395,10 @@ const ContasPage = () => {
                 <p><strong>Nome:</strong> {detailsConta.nome}</p>
                 <p><strong>Saldo:</strong> R$ {detailsConta.saldo.toFixed(2)}</p>
                 <p><strong>Tipo:</strong> {detailsConta.tipo}</p>
-                <p><strong>Data:</strong> {new Date(detailsConta.data).toLocaleDateString()}</p>
+                <p><strong>Data:</strong> {formatDate(detailsConta.data)}</p>
                 <p><strong>ID:</strong> {detailsConta._id}</p>
-                <p><strong>Data de Criação:</strong> {new Date(detailsConta.createdAt).toLocaleString()}</p>
-                <p><strong>Última Atualização:</strong> {new Date(detailsConta.updatedAt).toLocaleString()}</p>
+                <p><strong>Data de Criação:</strong> {formatDate(detailsConta.createdAt)}</p>
+                <p><strong>Última Atualização:</strong> {formatDate(detailsConta.updatedAt)}</p>
               </>
             )}
           </Modal.Body>

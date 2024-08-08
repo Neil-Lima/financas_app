@@ -20,6 +20,11 @@ const contaSchema = new mongoose.Schema({
     enum: ['corrente', 'poupança', 'investimento'],
     required: true,
   },
+  data: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
