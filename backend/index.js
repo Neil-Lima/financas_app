@@ -16,7 +16,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://financasappproject.netlify.app', 'https://financas-app-three.vercel.app'],
+  origin: ['http://localhost:3000', 'https://financasappproject.netlify.app', 'https://financas-app-silk.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
