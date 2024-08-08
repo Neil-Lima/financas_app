@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const transacaoController = require('./transacaoController');
-const { authMiddleware } = require('../middleware/Middleware');
+const { authMiddleware, rateLimitMiddleware } = require('../middleware/Middleware');
 
 router.use(authMiddleware);
+router.use(rateLimitMiddleware);
 
 router.get('/', transacaoController.listarTransacoes);
 router.post('/', transacaoController.criarTransacao);

@@ -14,22 +14,21 @@ const categoriasPredefinidas = [
 ];
 
 const inicializarCategorias = async () => {
-  try {
-    for (const categoria of categoriasPredefinidas) {
-      await Categoria.findOneAndUpdate(
-        { nome: categoria.nome },
-        categoria,
-        { upsert: true, new: true }
-      );
-    }
-    
-  } catch (error) {
-    
+  for (const categoria of categoriasPredefinidas) {
+    await Categoria.findOneAndUpdate(
+      { nome: categoria.nome },
+      categoria,
+      { upsert: true, new: true }
+    );
   }
 };
 
-const listarCategorias = async () => {
-  return await Categoria.find();
+const listarCategorias = async (page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+  return await Categoria.find()
+    .sort({ nome: 1 })
+    .skip(skip)
+    .limit(limit);
 };
 
 const criarCategoria = async (categoriaData) => {
@@ -37,11 +36,18 @@ const criarCategoria = async (categoriaData) => {
 };
 
 const atualizarCategoria = async (id, categoriaData) => {
-  return await Categoria.findByIdAndUpdate(id, categoriaData, { new: true });
+  const categoria = await Categoria.findByIdAndUpdate(id, categoriaData, { new: true, runValidators: true });
+  if (!categoria) {
+    throw new Error('Categoria não encontrada');
+  }
+  return categoria;
 };
 
 const excluirCategoria = async (id) => {
-  return await Categoria.findByIdAndDelete(id);
+  const categoria = await Categoria.findByIdAndDelete(id);
+  if (!categoria) {
+    throw new Error('Categoria não encontrada');
+  }
 };
 
 const inicializarModuloCategorias = async () => {

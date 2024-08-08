@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const parcelamentoController = require('./parcelamentoController');
-const { authMiddleware } = require('../middleware/Middleware');
+const { authMiddleware, rateLimitMiddleware } = require('../middleware/Middleware');
 
 router.use(authMiddleware);
+router.use(rateLimitMiddleware);
 
 router.get('/', parcelamentoController.listarParcelamentos);
 router.post('/', parcelamentoController.criarParcelamento);

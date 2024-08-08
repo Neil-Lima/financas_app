@@ -25,19 +25,6 @@ const contaSchema = new mongoose.Schema({
     required: true,
     default: Date.now,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-contaSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Conta', contaSchema);

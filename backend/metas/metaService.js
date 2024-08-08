@@ -1,7 +1,11 @@
 const Meta = require('./metaModel');
 
-const listarMetas = async (usuarioId) => {
-  return await Meta.find({ usuario: usuarioId });
+const listarMetas = async (usuarioId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+  return await Meta.find({ usuario: usuarioId })
+    .sort({ data_limite: 1 })
+    .skip(skip)
+    .limit(limit);
 };
 
 const criarMeta = async (usuarioId, metaData) => {
@@ -14,8 +18,12 @@ const criarMeta = async (usuarioId, metaData) => {
   return novaMeta;
 };
 
-const atualizarMeta = async (id, metaData) => {
-  const meta = await Meta.findByIdAndUpdate(id, metaData, { new: true, runValidators: true });
+const atualizarMeta = async (id, metaData, usuarioId) => {
+  const meta = await Meta.findOneAndUpdate(
+    { _id: id, usuario: usuarioId },
+    metaData,
+    { new: true, runValidators: true }
+  );
   if (!meta) {
     throw new Error('Meta não encontrada');
   }
@@ -23,8 +31,8 @@ const atualizarMeta = async (id, metaData) => {
   return meta;
 };
 
-const deletarMeta = async (id) => {
-  const meta = await Meta.findByIdAndDelete(id);
+const deletarMeta = async (id, usuarioId) => {
+  const meta = await Meta.findOneAndDelete({ _id: id, usuario: usuarioId });
   if (!meta) {
     throw new Error('Meta não encontrada');
   }

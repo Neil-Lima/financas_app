@@ -1,11 +1,14 @@
 const Transacao = require('./transacaoModel');
 const Conta = require('../contas/contaModel');
 
-const listarTransacoes = async (usuarioId) => {
+const listarTransacoes = async (usuarioId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
   return await Transacao.find({ usuario: usuarioId })
     .populate('conta')
     .populate('categoria')
-    .sort({ data: -1 });
+    .sort({ data: -1 })
+    .skip(skip)
+    .limit(limit);
 };
 
 const criarTransacao = async (usuarioId, transacaoData) => {
@@ -18,8 +21,12 @@ const criarTransacao = async (usuarioId, transacaoData) => {
   return transacao;
 };
 
-const atualizarTransacao = async (id, transacaoData) => {
-  const transacao = await Transacao.findByIdAndUpdate(id, transacaoData, { new: true });
+const atualizarTransacao = async (id, transacaoData, usuarioId) => {
+  const transacao = await Transacao.findOneAndUpdate(
+    { _id: id, usuario: usuarioId },
+    transacaoData,
+    { new: true }
+  );
   if (!transacao) {
     throw new Error('Transação não encontrada');
   }
@@ -28,8 +35,8 @@ const atualizarTransacao = async (id, transacaoData) => {
   return transacao;
 };
 
-const deletarTransacao = async (id) => {
-  const transacao = await Transacao.findByIdAndDelete(id);
+const deletarTransacao = async (id, usuarioId) => {
+  const transacao = await Transacao.findOneAndDelete({ _id: id, usuario: usuarioId });
   if (!transacao) {
     throw new Error('Transação não encontrada');
   }

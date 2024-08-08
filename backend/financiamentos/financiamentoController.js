@@ -1,9 +1,9 @@
-// financiamentoController.js
 const financiamentoService = require('./financiamentoService');
 
 const listarFinanciamentos = async (req, res) => {
   try {
-    const financiamentos = await financiamentoService.listarFinanciamentos(req.user.id);
+    const { page, limit } = req.query;
+    const financiamentos = await financiamentoService.listarFinanciamentos(req.user.id, page, limit);
     res.json(financiamentos);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -21,7 +21,7 @@ const criarFinanciamento = async (req, res) => {
 
 const atualizarFinanciamento = async (req, res) => {
   try {
-    const financiamento = await financiamentoService.atualizarFinanciamento(req.params.id, req.body);
+    const financiamento = await financiamentoService.atualizarFinanciamento(req.params.id, req.body, req.user.id);
     res.json(financiamento);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -30,7 +30,7 @@ const atualizarFinanciamento = async (req, res) => {
 
 const deletarFinanciamento = async (req, res) => {
   try {
-    await financiamentoService.deletarFinanciamento(req.params.id);
+    await financiamentoService.deletarFinanciamento(req.params.id, req.user.id);
     res.status(204).send();
   } catch (error) {
     res.status(400).json({ message: error.message });

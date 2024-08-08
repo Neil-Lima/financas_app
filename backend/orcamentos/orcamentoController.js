@@ -2,7 +2,8 @@ const orcamentoService = require('./orcamentoService');
 
 const listarOrcamentos = async (req, res) => {
   try {
-    const orcamentos = await orcamentoService.listarOrcamentos(req.user.id, req.query.ano);
+    const { ano, page, limit } = req.query;
+    const orcamentos = await orcamentoService.listarOrcamentos(req.user.id, ano, page, limit);
     res.json(orcamentos);
   } catch (error) {
     res.status(500).json({ message: error.message });

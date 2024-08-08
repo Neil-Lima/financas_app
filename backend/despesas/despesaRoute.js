@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const despesaController = require('./despesaController');
-const { authMiddleware } = require('../middleware/Middleware');
+const { authMiddleware, rateLimitMiddleware } = require('../middleware/Middleware');
 
 router.use(authMiddleware);
+router.use(rateLimitMiddleware);
 
 router.get('/', despesaController.listarDespesas);
 router.post('/', despesaController.criarDespesa);

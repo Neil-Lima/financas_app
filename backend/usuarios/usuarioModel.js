@@ -1,4 +1,3 @@
-// usuarioModel.js
 const mongoose = require('mongoose');
 
 const usuarioSchema = new mongoose.Schema({
@@ -15,10 +14,9 @@ const usuarioSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  created_at: {
-    type: Date,
-    default: Date.now,
+  refreshToken: {
+    type: String,
   },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);

@@ -1,4 +1,3 @@
-// financiamentoModel.js
 const mongoose = require('mongoose');
 
 const financiamentoSchema = new mongoose.Schema({
@@ -27,6 +26,6 @@ const financiamentoSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Financiamento', financiamentoSchema);

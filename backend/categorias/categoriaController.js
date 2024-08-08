@@ -2,7 +2,8 @@ const categoriaService = require('./categoriaService');
 
 const listarCategorias = async (req, res) => {
   try {
-    const categorias = await categoriaService.listarCategorias();
+    const { page, limit } = req.query;
+    const categorias = await categoriaService.listarCategorias(page, limit);
     res.json(categorias);
   } catch (error) {
     res.status(500).json({ message: error.message });
