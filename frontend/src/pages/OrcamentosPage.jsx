@@ -35,6 +35,7 @@ import { Bar } from "react-chartjs-2";
 import Layout from "../layout/Layout";
 import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
+import io from 'socket.io-client';
 
 ChartJS.register(
   ArcElement,
@@ -132,8 +133,18 @@ const OrcamentosPage = () => {
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   useEffect(() => {
+    const socket = io('https://financas-app-kappa.vercel.app');
+    socket.on('orcamentos_atualizados', () => {
+      fetchOrcamentos();
+    });
+
     fetchOrcamentos();
     fetchCategorias();
+
+    return () => {
+      socket.off('orcamentos_atualizados');
+      socket.disconnect();
+    };
   }, []);
 
   const fetchOrcamentos = async () => {
@@ -427,7 +438,7 @@ const OrcamentosPage = () => {
                           value={newOrcamento.ano}
                           onChange={handleInputChange}
                           required
-                                              />
+                        />
                       </Form.Group>
                     </ResponsiveCol>
                     <ResponsiveCol xs={12} md={3}>
@@ -774,4 +785,3 @@ const OrcamentosPage = () => {
 };
 
 export default OrcamentosPage;
-

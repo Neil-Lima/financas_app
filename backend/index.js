@@ -13,14 +13,20 @@ const parcelamentoRoutes = require('./parcelamentos/parcelamentoRoute');
 const estoqueRoutes = require('./estoque/estoqueRoute');
 
 const app = express();
-
+const http = require('http').createServer(app);
+const io = require('socket.io')(http, {
+  cors: {
+    origin: ['http://localhost:3000', 'https://financasappproject.netlify.app', 'https://financas-app-kappa.vercel.app'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }
+});
 
 app.use(cors({
   origin: ['http://localhost:3000', 'https://financasappproject.netlify.app', 'https://financas-app-kappa.vercel.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-
 
 connectDB();
 
@@ -42,8 +48,19 @@ app.use('/api/despesas', despesaRoutes);
 app.use('/api/parcelamentos', parcelamentoRoutes);
 app.use('/api/estoque', estoqueRoutes);
 
+io.on('connection', (socket) => {
+  console.log('Um cliente se conectou');
+  
+  socket.on('disconnect', () => {
+    console.log('Um cliente se desconectou');
+  });
+});
+
+// Exportar io para uso em outros arquivos
+module.exports.io = io;
+
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+http.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
