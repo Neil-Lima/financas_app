@@ -70,7 +70,7 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/usuarios/login', { email, senha: password });
+      const response = await axios.post('https://financasappproject.netlify.app/api/usuarios/login', { email, senha: password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.usuario));
       navigate('/home');
@@ -84,7 +84,7 @@ function LoginPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/usuarios/register', {
+      const response = await axios.post('https://financasappproject.netlify.app/api/usuarios/register', {
         nome: registerName,
         email: registerEmail,
         senha: registerPassword

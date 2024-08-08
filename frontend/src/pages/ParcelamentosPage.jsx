@@ -135,7 +135,7 @@ const ParcelamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        "http://localhost:5000/api/parcelamentos",
+        "https://financasappproject.netlify.app/api/parcelamentos",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -150,7 +150,7 @@ const ParcelamentosPage = () => {
   const fetchCategorias = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/categorias", {
+      const response = await axios.get("https://financasappproject.netlify.app/api/categorias", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategorias(response.data);
@@ -170,7 +170,7 @@ const ParcelamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        "http://localhost:5000/api/parcelamentos",
+        "https://financasappproject.netlify.app/api/parcelamentos",
         newParcelamento,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -205,7 +205,7 @@ const ParcelamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/parcelamentos/${editingId}`,
+        `https://financasappproject.netlify.app/api/parcelamentos/${editingId}`,
         editedParcelamento,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -224,7 +224,7 @@ const ParcelamentosPage = () => {
     if (window.confirm("Tem certeza que deseja excluir este parcelamento?")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:5000/api/parcelamentos/${id}`, {
+        await axios.delete(`https://financasappproject.netlify.app/api/parcelamentos/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchParcelamentos();

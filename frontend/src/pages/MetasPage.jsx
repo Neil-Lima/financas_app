@@ -73,7 +73,7 @@ const MetasPage = () => {
   const fetchMetas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/metas', {
+      const response = await axios.get('https://financasappproject.netlify.app/api/metas', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMetas(response.data);
@@ -86,7 +86,7 @@ const MetasPage = () => {
   const fetchEstatisticas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/metas/estatisticas', {
+      const response = await axios.get('https://financasappproject.netlify.app/api/metas/estatisticas', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEstatisticas(response.data);
@@ -118,7 +118,7 @@ const MetasPage = () => {
       if (newMeta.recorrente) {
         metaData.periodo_recorrencia = newMeta.periodo_recorrencia;
       }
-      await axios.post('http://localhost:5000/api/metas', metaData, {
+      await axios.post('https://financasappproject.netlify.app/api/metas', metaData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewMeta({
@@ -162,7 +162,7 @@ const MetasPage = () => {
       if (!editedMeta.recorrente) {
         delete metaData.periodo_recorrencia;
       }
-      await axios.put(`http://localhost:5000/api/metas/${editingId}`, metaData, {
+      await axios.put(`https://financasappproject.netlify.app/api/metas/${editingId}`, metaData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -178,7 +178,7 @@ const MetasPage = () => {
     if (window.confirm('Tem certeza que deseja excluir esta meta?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:5000/api/metas/${id}`, {
+        await axios.delete(`https://financasappproject.netlify.app/api/metas/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchMetas();
