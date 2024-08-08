@@ -44,7 +44,7 @@ const RelatoriosPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`https://financasappproject.netlify.app/api/relatorios/completo?dataInicio=${dataInicial}&dataFim=${dataFinal}`, {
+      const response = await axios.get(`http://localhost:5000/api/relatorios/completo?dataInicio=${dataInicial}&dataFim=${dataFinal}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRelatorio(response.data);
@@ -56,7 +56,7 @@ const RelatoriosPage = () => {
   const handleDownloadPDF = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`https://financasappproject.netlify.app/api/relatorios/pdf?dataInicio=${dataInicial}&dataFim=${dataFinal}`, {
+      const response = await axios.get(`http://localhost:5000/api/relatorios/pdf?dataInicio=${dataInicial}&dataFim=${dataFinal}`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: 'blob'
       });

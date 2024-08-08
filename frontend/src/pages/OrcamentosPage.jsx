@@ -130,7 +130,7 @@ const OrcamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://financasappproject.netlify.app/api/orcamentos?mes=${newOrcamento.mes}&ano=${newOrcamento.ano}`,
+        `http://localhost:5000/api/orcamentos?mes=${newOrcamento.mes}&ano=${newOrcamento.ano}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -144,7 +144,7 @@ const OrcamentosPage = () => {
   const fetchCategorias = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://financasappproject.netlify.app/api/categorias", {
+      const response = await axios.get("http://localhost:5000/api/categorias", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategorias(response.data);
@@ -162,7 +162,7 @@ const OrcamentosPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("https://financasappproject.netlify.app/api/orcamentos", newOrcamento, {
+      await axios.post("http://localhost:5000/api/orcamentos", newOrcamento, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setNewOrcamento({
@@ -191,7 +191,7 @@ const OrcamentosPage = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `https://financasappproject.netlify.app/api/orcamentos/${editingId}`,
+        `http://localhost:5000/api/orcamentos/${editingId}`,
         editedOrcamento,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -208,7 +208,7 @@ const OrcamentosPage = () => {
     if (window.confirm("Tem certeza que deseja excluir este orçamento?")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`https://financasappproject.netlify.app/api/orcamentos/${id}`, {
+        await axios.delete(`http://localhost:5000/api/orcamentos/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         fetchOrcamentos();

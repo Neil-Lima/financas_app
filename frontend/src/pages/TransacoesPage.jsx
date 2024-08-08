@@ -144,7 +144,7 @@ const TransacoesPage = () => {
   const fetchTransacoes = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://financasappproject.netlify.app/api/transacoes", {
+      const response = await axios.get("http://localhost:5000/api/transacoes", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTransacoes(response.data);
@@ -157,7 +157,7 @@ const TransacoesPage = () => {
   const fetchContas = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://financasappproject.netlify.app/api/contas", {
+      const response = await axios.get("http://localhost:5000/api/contas", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setContas(response.data);
@@ -170,7 +170,7 @@ const TransacoesPage = () => {
   const fetchCategorias = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("https://financasappproject.netlify.app/api/categorias", {
+      const response = await axios.get("http://localhost:5000/api/categorias", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCategorias(response.data);
@@ -189,7 +189,7 @@ const TransacoesPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.post("https://financasappproject.netlify.app/api/transacoes", newTransaction, {
+      const response = await axios.post("http://localhost:5000/api/transacoes", newTransaction, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTransacoes([...transacoes, response.data]);
@@ -222,7 +222,7 @@ const TransacoesPage = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.put(
-        `https://financasappproject.netlify.app/api/transacoes/${editingId}`,
+        `http://localhost:5000/api/transacoes/${editingId}`,
         editedTransaction,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -245,7 +245,7 @@ const TransacoesPage = () => {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://financasappproject.netlify.app/api/transacoes/${deleteId}`, {
+      await axios.delete(`http://localhost:5000/api/transacoes/${deleteId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTransacoes(transacoes.filter(t => t._id !== deleteId));
@@ -264,7 +264,7 @@ const TransacoesPage = () => {
       formData.append("file", importFile);
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.post("https://financasappproject.netlify.app/api/transacoes/import", formData, {
+        const response = await axios.post("http://localhost:5000/api/transacoes/import", formData, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",

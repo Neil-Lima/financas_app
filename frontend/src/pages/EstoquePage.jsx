@@ -96,7 +96,7 @@ const EstoquePage = () => {
   const fetchProdutos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/estoque', {
+      const response = await axios.get('http://localhost:5000/api/estoque', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProdutos(response.data);
@@ -109,7 +109,7 @@ const EstoquePage = () => {
   const fetchCategorias = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/categorias', {
+      const response = await axios.get('http://localhost:5000/api/categorias', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCategorias(response.data);
@@ -128,7 +128,7 @@ const EstoquePage = () => {
     event.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://financasappproject.netlify.app/api/estoque', newProduto, {
+      await axios.post('http://localhost:5000/api/estoque', newProduto, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewProduto({ nome: '', quantidade: '', preco: '', fornecedor: '', categoria: '' });
@@ -153,7 +153,7 @@ const EstoquePage = () => {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://financasappproject.netlify.app/api/estoque/${editingId}`, editedProduto, {
+      await axios.put(`http://localhost:5000/api/estoque/${editingId}`, editedProduto, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -169,7 +169,7 @@ const EstoquePage = () => {
     if (window.confirm('Tem certeza que deseja excluir este produto?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financasappproject.netlify.app/api/estoque/${id}`, {
+        await axios.delete(`http://localhost:5000/api/estoque/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchProdutos();

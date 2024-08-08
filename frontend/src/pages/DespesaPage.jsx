@@ -95,7 +95,7 @@ const DespesaPage = () => {
   const fetchDespesas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/despesas', {
+      const response = await axios.get('http://localhost:5000/api/despesas', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setDespesas(response.data);
@@ -108,7 +108,7 @@ const DespesaPage = () => {
   const fetchCategorias = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/categorias', {
+      const response = await axios.get('http://localhost:5000/api/categorias', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCategorias(response.data);
@@ -127,7 +127,7 @@ const DespesaPage = () => {
     event.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://financasappproject.netlify.app/api/despesas', newDespesa, {
+      await axios.post('http://localhost:5000/api/despesas', newDespesa, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewDespesa({ descricao: '', valor: '', data: '', categoria: '' });
@@ -152,7 +152,7 @@ const DespesaPage = () => {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://financasappproject.netlify.app/api/despesas/${editingId}`, editedDespesa, {
+      await axios.put(`http://localhost:5000/api/despesas/${editingId}`, editedDespesa, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -168,7 +168,7 @@ const DespesaPage = () => {
     if (window.confirm('Tem certeza que deseja excluir esta despesa?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financasappproject.netlify.app/api/despesas/${id}`, {
+        await axios.delete(`http://localhost:5000/api/despesas/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchDespesas();

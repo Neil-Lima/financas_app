@@ -124,11 +124,11 @@ const HomePage = () => {
     try {
       const token = localStorage.getItem('token');
       const [resumoResponse, reportResponse] = await Promise.all([
-        axios.get('https://financasappproject.netlify.app/api/resumo', {
+        axios.get('http://localhost:5000/api/resumo', {
           headers: { Authorization: `Bearer ${token}` },
           params: { startDate: startDate.toISOString(), endDate: endDate.toISOString() }
         }),
-        axios.get('https://financasappproject.netlify.app/api/relatorios/completo', {
+        axios.get('http://localhost:5000/api/relatorios/completo', {
           headers: { Authorization: `Bearer ${token}` },
           params: { startDate: startDate.toISOString(), endDate: endDate.toISOString() }
         })

@@ -77,7 +77,7 @@ const ContasPage = () => {
   const fetchContas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/contas', {
+      const response = await axios.get('http://localhost:5000/api/contas', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setContas(response.data);
@@ -96,7 +96,7 @@ const ContasPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://financasappproject.netlify.app/api/contas', newConta, {
+      await axios.post('http://localhost:5000/api/contas', newConta, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewConta({ nome: '', saldo: '', tipo: '', data: '' });
@@ -121,7 +121,7 @@ const ContasPage = () => {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://financasappproject.netlify.app/api/contas/${editingId}`, editedConta, {
+      await axios.put(`http://localhost:5000/api/contas/${editingId}`, editedConta, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -137,7 +137,7 @@ const ContasPage = () => {
     if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financasappproject.netlify.app/api/contas/${id}`, {
+        await axios.delete(`http://localhost:5000/api/contas/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchContas();

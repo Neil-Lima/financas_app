@@ -94,7 +94,7 @@ const FinanciamentosPage = () => {
   const fetchFinanciamentos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/financiamentos', {
+      const response = await axios.get('http://localhost:5000/api/financiamentos', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFinanciamentos(response.data);
@@ -113,7 +113,7 @@ const FinanciamentosPage = () => {
     event.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://financasappproject.netlify.app/api/financiamentos', newFinanciamento, {
+      await axios.post('http://localhost:5000/api/financiamentos', newFinanciamento, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewFinanciamento({ descricao: '', valor_total: '', taxa_juros: '', parcelas_totais: '', data_inicio: '' });
@@ -138,7 +138,7 @@ const FinanciamentosPage = () => {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://financasappproject.netlify.app/api/financiamentos/${editingId}`, editedFinanciamento, {
+      await axios.put(`http://localhost:5000/api/financiamentos/${editingId}`, editedFinanciamento, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -154,7 +154,7 @@ const FinanciamentosPage = () => {
     if (window.confirm('Tem certeza que deseja excluir este financiamento?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financasappproject.netlify.app/api/financiamentos/${id}`, {
+        await axios.delete(`http://localhost:5000/api/financiamentos/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchFinanciamentos();
