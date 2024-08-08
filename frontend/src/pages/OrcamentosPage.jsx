@@ -18,7 +18,7 @@ import {
   faCheck,
   faTimes,
   faEye,
-  faHistory,
+  faQuestionCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
 import {
@@ -128,9 +128,8 @@ const OrcamentosPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsOrcamento, setDetailsOrcamento] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
-  const [showHistoricoModal, setShowHistoricoModal] = useState(false);
-  const [historicoOrcamento, setHistoricoOrcamento] = useState([]);
   const [comparacaoAnual, setComparacaoAnual] = useState(null);
+  const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   useEffect(() => {
     fetchOrcamentos();
@@ -248,11 +247,6 @@ const OrcamentosPage = () => {
     setShowDetailsModal(true);
   };
 
-  const handleShowHistorico = (orcamento) => {
-    setHistoricoOrcamento(orcamento.historicoAlteracoes);
-    setShowHistoricoModal(true);
-  };
-
   const showAlert = (message, variant) => {
     setAlert({ show: true, message, variant });
     setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
@@ -348,6 +342,11 @@ const OrcamentosPage = () => {
           <Col>
             <h2>Orçamentos</h2>
           </Col>
+          <Col xs="auto">
+            <ResponsiveButton variant="info" onClick={() => setShowInstructionsModal(true)}>
+              <FontAwesomeIcon icon={faQuestionCircle} /> Instruções
+            </ResponsiveButton>
+          </Col>
         </Row>
 
         {alerts.length > 0 && (
@@ -428,7 +427,7 @@ const OrcamentosPage = () => {
                           value={newOrcamento.ano}
                           onChange={handleInputChange}
                           required
-                        />
+                                              />
                       </Form.Group>
                     </ResponsiveCol>
                     <ResponsiveCol xs={12} md={3}>
@@ -691,13 +690,6 @@ const OrcamentosPage = () => {
                                 >
                                   <FontAwesomeIcon icon={faEye} />
                                 </ResponsiveButton>
-                                <ResponsiveButton
-                                  variant="outline-secondary"
-                                  size="sm"
-                                  onClick={() => handleShowHistorico(orcamento)}
-                                >
-                                  <FontAwesomeIcon icon={faHistory} />
-                                </ResponsiveButton>
                               </>
                             )}
                           </td>
@@ -744,41 +736,34 @@ const OrcamentosPage = () => {
         </StyledModal>
 
         <StyledModal
-          show={showHistoricoModal}
-          onHide={() => setShowHistoricoModal(false)}
+          show={showInstructionsModal}
+          onHide={() => setShowInstructionsModal(false)}
           isDarkMode={isDarkMode}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Histórico de Alterações</Modal.Title>
+            <Modal.Title>Instruções</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {historicoOrcamento.length > 0 ? (
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Campo</th>
-                    <th>Valor Antigo</th>
-                    <th>Valor Novo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historicoOrcamento.map((alteracao, index) => (
-                    <tr key={index}>
-                      <td>{new Date(alteracao.data).toLocaleString()}</td>
-                      <td>{alteracao.campo}</td>
-                      <td>{alteracao.valorAntigo}</td>
-                      <td>{alteracao.valorNovo}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            ) : (
-              <p>Nenhuma alteração registrada.</p>
-            )}
+            <h5>Como usar a página de Orçamentos:</h5>
+            <ol>
+              <li>Adicione um novo orçamento usando o formulário no topo da página.</li>
+              <li>Visualize seus orçamentos no gráfico e na tabela abaixo.</li>
+              <li>Edite ou exclua orçamentos existentes usando os botões na tabela.</li>
+              <li>Compare seus orçamentos com o ano anterior usando o botão "Comparar com Ano Anterior".</li>
+            </ol>
+            <h5>Descrição dos campos:</h5>
+            <ul>
+              <li><strong>Categoria:</strong> A categoria do orçamento.</li>
+              <li><strong>Valor Planejado:</strong> O valor que você planeja gastar.</li>
+              <li><strong>Valor Atual:</strong> O valor que você já gastou.</li>
+              <li><strong>Valor Restante:</strong> A diferença entre o planejado e o atual.</li>
+              <li><strong>Recorrência:</strong> Se o orçamento se repete e com que frequência.</li>
+              <li><strong>Prioridade:</strong> A importância do orçamento (1-5).</li>
+              <li><strong>Meta de Economia:</strong> Quanto você pretende economizar nesta categoria.</li>
+            </ul>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowHistoricoModal(false)}>
+            <Button variant="secondary" onClick={() => setShowInstructionsModal(false)}>
               Fechar
             </Button>
           </Modal.Footer>
@@ -789,3 +774,4 @@ const OrcamentosPage = () => {
 };
 
 export default OrcamentosPage;
+
