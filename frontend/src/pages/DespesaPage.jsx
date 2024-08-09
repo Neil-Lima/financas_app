@@ -3,13 +3,9 @@ import { Container, Row, Col, Card, Button, Form, Table, Modal, Alert } from 're
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faCheck, faTimes, faEye } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
-import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
 import Layout from '../layout/Layout';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
-
-ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const StyledContainer = styled(Container)`
   padding: 20px;
@@ -29,16 +25,9 @@ const StyledCard = styled(Card)`
   }
 `;
 
-const ChartContainer = styled.div`
-  height: 300px;
-  width: 100%;
-  @media (max-width: 768px) {
-    height: 200px;
-  }
-`;
-
 const StyledTable = styled(Table)`
   color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
+  
   @media (max-width: 768px) {
     font-size: 0.8rem;
   }
@@ -49,6 +38,13 @@ const ResponsiveButton = styled(Button)`
     font-size: 0.8rem;
     padding: 0.25rem 0.5rem;
     margin: 0.2rem;
+  }
+`;
+
+const StyledModal = styled(Modal)`
+  .modal-content {
+    background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
+    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
   }
 `;
 
@@ -64,38 +60,53 @@ const ResponsiveForm = styled(Form)`
   }
 `;
 
-const StyledModal = styled(Modal)`
-  .modal-content {
-    background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
-    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
-  }
-`;
-
 const DespesaPage = () => {
   const { isDarkMode } = useTheme();
   const [despesas, setDespesas] = useState([]);
-  const [categorias, setCategorias] = useState([]);
-  const [newDespesa, setNewDespesa] = useState({
-    descricao: '',
-    valor: '',
-    data: '',
-    categoria: ''
-  });
+  const [newDespesa, setNewDespesa] = useState({ descricao: '', valor: '', data: '', categoria: '' });
   const [editingId, setEditingId] = useState(null);
   const [editedDespesa, setEditedDespesa] = useState({});
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsDespesa, setDetailsDespesa] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
+  const [categorias, setCategorias] = useState([]);
+  const [lastSync, setLastSync] = useState(null);
 
   useEffect(() => {
     fetchDespesas();
     fetchCategorias();
   }, []);
 
+  useEffect(() => {
+    const syncInterval = setInterval(() => {
+      syncData();
+    }, 5000); // Sincroniza a cada 5 segundos
+
+    return () => clearInterval(syncInterval);
+  }, []);
+
+  const syncData = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await axios.get('https://financasappproject.netlify.app/api/sync', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.lastSync !== lastSync) {
+          setLastSync(response.data.lastSync);
+          fetchDespesas();
+          fetchCategorias();
+        }
+      } catch (error) {
+        console.error('Erro na sincronização:', error);
+      }
+    }
+  };
+
   const fetchDespesas = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financas-app-kappa.vercel.app/api/despesas', {
+      const response = await axios.get('https://financasappproject.netlify.app/api/despesas', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setDespesas(response.data);
@@ -108,7 +119,7 @@ const DespesaPage = () => {
   const fetchCategorias = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financas-app-kappa.vercel.app/api/categorias', {
+      const response = await axios.get('https://financasappproject.netlify.app/api/categorias', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCategorias(response.data);
@@ -118,16 +129,20 @@ const DespesaPage = () => {
     }
   };
 
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
     setNewDespesa({ ...newDespesa, [name]: value });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://financas-app-kappa.vercel.app/api/despesas', newDespesa, {
+      const formattedData = {
+        ...newDespesa,
+        data: new Date(newDespesa.data).toISOString()
+      };
+      await axios.post('https://financasappproject.netlify.app/api/despesas', formattedData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewDespesa({ descricao: '', valor: '', data: '', categoria: '' });
@@ -141,18 +156,22 @@ const DespesaPage = () => {
 
   const handleEdit = (despesa) => {
     setEditingId(despesa._id);
-    setEditedDespesa(despesa);
+    setEditedDespesa({...despesa, data: new Date(despesa.data).toISOString().split('T')[0]});
   };
 
-  const handleEditChange = (event) => {
-    const { name, value } = event.target;
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
     setEditedDespesa({ ...editedDespesa, [name]: value });
   };
 
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://financas-app-kappa.vercel.app/api/despesas/${editingId}`, editedDespesa, {
+      const formattedData = {
+        ...editedDespesa,
+        data: new Date(editedDespesa.data).toISOString()
+      };
+      await axios.put(`https://financasappproject.netlify.app/api/despesas/${editingId}`, formattedData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -168,7 +187,7 @@ const DespesaPage = () => {
     if (window.confirm('Tem certeza que deseja excluir esta despesa?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financas-app-kappa.vercel.app/api/despesas/${id}`, {
+        await axios.delete(`https://financasappproject.netlify.app/api/despesas/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchDespesas();
@@ -190,48 +209,8 @@ const DespesaPage = () => {
     setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
   };
 
-  const chartData = {
-    labels: categorias.map(categoria => categoria.nome),
-    datasets: [
-      {
-        label: 'Total de Despesas por Categoria',
-        data: categorias.map(categoria => 
-          despesas.filter(despesa => despesa.categoria._id === categoria._id)
-            .reduce((acc, curr) => acc + curr.valor, 0)
-        ),
-        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-      }
-    ]
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          color: isDarkMode ? '#ffffff' : '#000000'
-        }
-      },
-      x: {
-        ticks: {
-          color: isDarkMode ? '#ffffff' : '#000000'
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: isDarkMode ? '#ffffff' : '#000000'
-        }
-      },
-      title: {
-        display: true,
-        text: 'Total de Despesas por Categoria',
-        color: isDarkMode ? '#ffffff' : '#000000'
-      }
-    }
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
   };
 
   return (
@@ -302,9 +281,11 @@ const DespesaPage = () => {
                           onChange={handleInputChange}
                           required
                         >
-                          <option value="">Selecione uma categoria</option>
-                          {categorias.map(categoria => (
-                            <option key={categoria._id} value={categoria._id}>{categoria.nome}</option>
+                          <option value="">Selecione a categoria</option>
+                          {categorias.map((categoria) => (
+                            <option key={categoria._id} value={categoria._id}>
+                              {categoria.nome}
+                            </option>
                           ))}
                         </Form.Control>
                       </Form.Group>
@@ -315,19 +296,6 @@ const DespesaPage = () => {
                     Adicionar Despesa
                   </ResponsiveButton>
                 </ResponsiveForm>
-              </Card.Body>
-            </StyledCard>
-          </Col>
-        </Row>
-
-        <Row className="mb-4">
-          <Col>
-            <StyledCard isDarkMode={isDarkMode}>
-              <Card.Body>
-                <Card.Title>Visão Geral de Despesas</Card.Title>
-                <ChartContainer>
-                  <Bar data={chartData} options={chartOptions} />
-                </ChartContainer>
               </Card.Body>
             </StyledCard>
           </Col>
@@ -385,7 +353,7 @@ const DespesaPage = () => {
                                 onChange={handleEditChange}
                               />
                             ) : (
-                              new Date(despesa.data).toLocaleDateString()
+                              formatDate(despesa.data)
                             )}
                           </td>
                           <td>
@@ -396,8 +364,10 @@ const DespesaPage = () => {
                                 value={editedDespesa.categoria}
                                 onChange={handleEditChange}
                               >
-                                {categorias.map(categoria => (
-                                  <option key={categoria._id} value={categoria._id}>{categoria.nome}</option>
+                                {categorias.map((categoria) => (
+                                  <option key={categoria._id} value={categoria._id}>
+                                    {categoria.nome}
+                                  </option>
                                 ))}
                               </Form.Control>
                             ) : (
@@ -423,11 +393,12 @@ const DespesaPage = () => {
                                   <FontAwesomeIcon icon={faTimes} />
                                 </ResponsiveButton>
                               </>
-                                                        ) : (
+                            ) : (
                               <>
                                 <ResponsiveButton
                                   variant="outline-primary"
                                   size="sm"
+                                  className="mr-2"
                                   onClick={() => handleEdit(despesa)}
                                 >
                                   <FontAwesomeIcon icon={faEdit} />
@@ -435,6 +406,7 @@ const DespesaPage = () => {
                                 <ResponsiveButton
                                   variant="outline-danger"
                                   size="sm"
+                                  className="mr-2"
                                   onClick={() => handleDelete(despesa._id)}
                                 >
                                   <FontAwesomeIcon icon={faTrash} />
@@ -468,9 +440,10 @@ const DespesaPage = () => {
               <>
                 <p><strong>Descrição:</strong> {detailsDespesa.descricao}</p>
                 <p><strong>Valor:</strong> R$ {detailsDespesa.valor.toFixed(2)}</p>
-                <p><strong>Data:</strong> {new Date(detailsDespesa.data).toLocaleDateString()}</p>
+                <p><strong>Data:</strong> {formatDate(detailsDespesa.data)}</p>
                 <p><strong>Categoria:</strong> {detailsDespesa.categoria.nome}</p>
-                <p><strong>ID:</strong> {detailsDespesa._id}</p>
+                <p><strong>Data de Criação:</strong> {formatDate(detailsDespesa.createdAt)}</p>
+                <p><strong>Última Atualização:</strong> {formatDate(detailsDespesa.updatedAt)}</p>
               </>
             )}
           </Modal.Body>
@@ -486,4 +459,3 @@ const DespesaPage = () => {
 };
 
 export default DespesaPage;
-

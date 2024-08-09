@@ -110,14 +110,42 @@ const HomePage = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastSync, setLastSync] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
+    } else {
+      fetchData();
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const syncInterval = setInterval(() => {
+      syncData();
+    }, 5000); // Sincroniza a cada 5 segundos
+
+    return () => clearInterval(syncInterval);
+  }, []);
+
+  const syncData = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await axios.get('https://financas-app-kappa.vercel.app/api/sync', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.lastSync !== lastSync) {
+          setLastSync(response.data.lastSync);
+          fetchData();
+        }
+      } catch (error) {
+        console.error('Erro na sincronização:', error);
+      }
+    }
+  };
 
   const fetchData = async () => {
     setIsLoading(true);
