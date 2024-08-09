@@ -14,13 +14,7 @@ const estoqueRoutes = require('./estoque/estoqueRoute');
 
 const app = express();
 
-
-app.use(cors({
-  origin: ['http://localhost:3000', 'https://financasappproject.netlify.app', 'https://financas-app-kappa.vercel.app'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
+app.use(cors());
 
 connectDB();
 
