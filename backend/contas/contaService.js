@@ -16,35 +16,20 @@ const inicializarContasUsuario = async (usuarioId) => {
   }
 };
 
-const listarContas = async (usuarioId, page = 1, limit = 10) => {
-  const skip = (page - 1) * limit;
-  return await Conta.find({ usuario: usuarioId })
-    .sort({ nome: 1 })
-    .skip(skip)
-    .limit(limit);
+const listarContas = async (usuarioId) => {
+  return await Conta.find({ usuario: usuarioId });
 };
 
 const criarConta = async (usuarioId, contaData) => {
   return await Conta.create({ ...contaData, usuario: usuarioId });
 };
 
-const atualizarConta = async (id, contaData, usuarioId) => {
-  const conta = await Conta.findOneAndUpdate(
-    { _id: id, usuario: usuarioId },
-    contaData,
-    { new: true, runValidators: true }
-  );
-  if (!conta) {
-    throw new Error('Conta não encontrada');
-  }
-  return conta;
+const atualizarConta = async (id, contaData) => {
+  return await Conta.findByIdAndUpdate(id, { ...contaData, updatedAt: new Date() }, { new: true });
 };
 
-const deletarConta = async (id, usuarioId) => {
-  const conta = await Conta.findOneAndDelete({ _id: id, usuario: usuarioId });
-  if (!conta) {
-    throw new Error('Conta não encontrada');
-  }
+const deletarConta = async (id) => {
+  return await Conta.findByIdAndDelete(id);
 };
 
 module.exports = { 

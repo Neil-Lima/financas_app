@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Container, Form, Button, Modal, Alert, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -65,37 +65,7 @@ function LoginPage() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertVariant, setAlertVariant] = useState('info');
-  const [lastSync, setLastSync] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const syncInterval = setInterval(() => {
-      syncData();
-    }, 5000); // Sincroniza a cada 5 segundos
-
-    return () => clearInterval(syncInterval);
-  }, []);
-
-  const syncData = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await axios.get('https://financas-app-kappa.vercel.app/api/sync', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (response.data.lastSync !== lastSync) {
-          setLastSync(response.data.lastSync);
-          // Aqui você atualizaria os estados relevantes com os novos dados
-          // Por exemplo:
-          // setEmail(response.data.email);
-          // setRegisterName(response.data.name);
-          // etc...
-        }
-      } catch (error) {
-        console.error('Erro na sincronização:', error);
-      }
-    }
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -103,7 +73,6 @@ function LoginPage() {
       const response = await axios.post('https://financas-app-kappa.vercel.app/api/usuarios/login', { email, senha: password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.usuario));
-      setLastSync(new Date().toISOString());
       navigate('/home');
     } catch (error) {
       setAlertVariant('danger');
@@ -126,7 +95,6 @@ function LoginPage() {
       setShowRegisterModal(false);
       setEmail(registerEmail);
       setPassword(registerPassword);
-      setLastSync(new Date().toISOString());
     } catch (error) {
       setAlertVariant('danger');
       if (error.response && error.response.status === 400 && error.response.data.message.includes('já está em uso')) {

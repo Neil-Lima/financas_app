@@ -1,32 +1,23 @@
 const Despesa = require('./despesaModel');
 
-const listarDespesas = async (usuarioId, page = 1, limit = 10) => {
-  const skip = (page - 1) * limit;
-  return await Despesa.find({ usuario: usuarioId })
-    .populate('categoria')
-    .sort({ data: -1 })
-    .skip(skip)
-    .limit(limit);
+const listarDespesas = async (usuarioId) => {
+  return await Despesa.find({ usuario: usuarioId }).populate('categoria');
 };
 
 const criarDespesa = async (usuarioId, despesaData) => {
   return await Despesa.create({ ...despesaData, usuario: usuarioId });
 };
 
-const atualizarDespesa = async (id, despesaData, usuarioId) => {
-  const despesa = await Despesa.findOneAndUpdate(
-    { _id: id, usuario: usuarioId },
-    despesaData,
-    { new: true, runValidators: true }
-  ).populate('categoria');
+const atualizarDespesa = async (id, despesaData) => {
+  const despesa = await Despesa.findByIdAndUpdate(id, despesaData, { new: true });
   if (!despesa) {
     throw new Error('Despesa não encontrada');
   }
   return despesa;
 };
 
-const deletarDespesa = async (id, usuarioId) => {
-  const despesa = await Despesa.findOneAndDelete({ _id: id, usuario: usuarioId });
+const deletarDespesa = async (id) => {
+  const despesa = await Despesa.findByIdAndDelete(id);
   if (!despesa) {
     throw new Error('Despesa não encontrada');
   }

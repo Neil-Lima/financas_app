@@ -1,3 +1,4 @@
+// usuarioController.js
 const usuarioService = require('./usuarioService');
 
 const criarUsuario = async (req, res) => {
@@ -11,9 +12,8 @@ const criarUsuario = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { accessToken, refreshToken, usuario } = await usuarioService.login(req.body);
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, sameSite: 'strict' });
-    res.json({ accessToken, usuario });
+    const { token, usuario } = await usuarioService.login(req.body);
+    res.json({ token, usuario });
   } catch (error) {
     res.status(401).json({ message: error.message });
   }
@@ -28,13 +28,4 @@ const getUsuario = async (req, res) => {
   }
 };
 
-const atualizarUsuario = async (req, res) => {
-  try {
-    const usuario = await usuarioService.atualizarUsuario(req.user.id, req.body);
-    res.json(usuario);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-module.exports = { criarUsuario, login, getUsuario, atualizarUsuario };
+module.exports = { criarUsuario, login, getUsuario };

@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const contaController = require('./contaController');
-const { authMiddleware, rateLimitMiddleware } = require('../middleware/Middleware');
+const { authMiddleware } = require('../middleware/Middleware');
 
 router.use(authMiddleware);
-router.use(rateLimitMiddleware);
 
 router.get('/', contaController.listarContas);
 router.post('/', contaController.criarConta);

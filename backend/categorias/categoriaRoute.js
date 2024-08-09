@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const categoriaController = require('./categoriaController');
-const { authMiddleware, rateLimitMiddleware } = require('../middleware/Middleware');
+const { authMiddleware } = require('../middleware/Middleware');
 const { inicializarModuloCategorias } = require('./categoriaService');
 
 inicializarModuloCategorias();
 
 router.use(authMiddleware);
-router.use(rateLimitMiddleware);
 
 router.get('/', categoriaController.listarCategorias);
 router.post('/', categoriaController.criarCategoria);

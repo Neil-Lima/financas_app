@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const metaController = require('./metaController');
-const { authMiddleware, rateLimitMiddleware } = require('../middleware/Middleware');
+const { authMiddleware } = require('../middleware/Middleware');
 
 router.use(authMiddleware);
-router.use(rateLimitMiddleware);
 
 router.get('/', metaController.listarMetas);
 router.post('/', metaController.criarMeta);

@@ -69,36 +69,10 @@ const ContasPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsConta, setDetailsConta] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
-  const [lastSync, setLastSync] = useState(null);
 
   useEffect(() => {
     fetchContas();
   }, []);
-
-  useEffect(() => {
-    const syncInterval = setInterval(() => {
-      syncData();
-    }, 5000); // Sincroniza a cada 5 segundos
-
-    return () => clearInterval(syncInterval);
-  }, []);
-
-  const syncData = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await axios.get('https://financasappproject.netlify.app/api/sync', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (response.data.lastSync !== lastSync) {
-          setLastSync(response.data.lastSync);
-          fetchContas();
-        }
-      } catch (error) {
-        console.error('Erro na sincronização:', error);
-      }
-    }
-  };
 
   const fetchContas = async () => {
     try {
@@ -418,10 +392,12 @@ const ContasPage = () => {
           <Modal.Body>
             {detailsConta && (
               <>
-                              <p><strong>Nome:</strong> {detailsConta.nome}</p>
+                <p><strong>Nome:</strong> {detailsConta.nome}</p>
                 <p><strong>Saldo:</strong> R$ {detailsConta.saldo.toFixed(2)}</p>
                 <p><strong>Tipo:</strong> {detailsConta.tipo}</p>
-                <p><strong>Data de Criação:</strong> {formatDate(detailsConta.data)}</p>
+                <p><strong>Data:</strong> {formatDate(detailsConta.data)}</p>
+                <p><strong>ID:</strong> {detailsConta._id}</p>
+                <p><strong>Data de Criação:</strong> {formatDate(detailsConta.createdAt)}</p>
                 <p><strong>Última Atualização:</strong> {formatDate(detailsConta.updatedAt)}</p>
               </>
             )}
@@ -438,4 +414,3 @@ const ContasPage = () => {
 };
 
 export default ContasPage;
-

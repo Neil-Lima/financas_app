@@ -1,5 +1,5 @@
 const Usuario = require('./usuarioModel');
-const { generateAccessToken, generateRefreshToken, hashPassword, comparePassword } = require('../auth/auth');
+const { generateToken, hashPassword, comparePassword } = require('../auth/auth');
 const { inicializarContasUsuario } = require('../contas/contaService');
 
 const criarUsuario = async (userData) => {
@@ -20,27 +20,17 @@ const login = async (credentials) => {
   if (!senhaValida) {
     throw new Error('Senha inválida');
   }
-  const accessToken = generateAccessToken(usuario);
-  const refreshToken = generateRefreshToken(usuario);
-  usuario.refreshToken = refreshToken;
-  await usuario.save();
-  return { accessToken, refreshToken, usuario: { id: usuario._id, nome: usuario.nome, email: usuario.email } };
+  await inicializarContasUsuario(usuario._id);
+  const token = generateToken(usuario);
+  return { token, usuario: { id: usuario._id, nome: usuario.nome, email: usuario.email } };
 };
 
 const getUsuario = async (id) => {
-  const usuario = await Usuario.findById(id).select('-senha -refreshToken');
+  const usuario = await Usuario.findById(id).select('-senha');
   if (!usuario) {
     throw new Error('Usuário não encontrado');
   }
   return usuario;
 };
 
-const atualizarUsuario = async (id, userData) => {
-  const usuario = await Usuario.findByIdAndUpdate(id, userData, { new: true }).select('-senha -refreshToken');
-  if (!usuario) {
-    throw new Error('Usuário não encontrado');
-  }
-  return usuario;
-};
-
-module.exports = { criarUsuario, login, getUsuario, atualizarUsuario };
+module.exports = { criarUsuario, login, getUsuario };

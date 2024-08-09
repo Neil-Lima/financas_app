@@ -1,12 +1,7 @@
 const Orcamento = require('./orcamentoModel');
 
-const listarOrcamentos = async (usuarioId, ano, page = 1, limit = 10) => {
-  const skip = (page - 1) * limit;
-  return await Orcamento.find({ usuario: usuarioId, ano: ano })
-    .populate('categoria')
-    .sort({ mes: 1 })
-    .skip(skip)
-    .limit(limit);
+const listarOrcamentos = async (usuarioId, ano) => {
+  return await Orcamento.find({ usuario: usuarioId, ano: ano }).populate('categoria');
 };
 
 const criarOrcamento = async (usuarioId, orcamentoData) => {

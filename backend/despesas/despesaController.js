@@ -2,8 +2,7 @@ const despesaService = require('./despesaService');
 
 const listarDespesas = async (req, res) => {
   try {
-    const { page, limit } = req.query;
-    const despesas = await despesaService.listarDespesas(req.user.id, page, limit);
+    const despesas = await despesaService.listarDespesas(req.user.id);
     res.json(despesas);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -21,7 +20,7 @@ const criarDespesa = async (req, res) => {
 
 const atualizarDespesa = async (req, res) => {
   try {
-    const despesa = await despesaService.atualizarDespesa(req.params.id, req.body, req.user.id);
+    const despesa = await despesaService.atualizarDespesa(req.params.id, req.body);
     res.json(despesa);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -30,7 +29,7 @@ const atualizarDespesa = async (req, res) => {
 
 const deletarDespesa = async (req, res) => {
   try {
-    await despesaService.deletarDespesa(req.params.id, req.user.id);
+    await despesaService.deletarDespesa(req.params.id);
     res.status(204).send();
   } catch (error) {
     res.status(400).json({ message: error.message });

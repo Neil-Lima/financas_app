@@ -27,6 +27,6 @@ const parcelamentoSchema = new mongoose.Schema({
     ref: 'Categoria',
     required: true,
   },
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model('Parcelamento', parcelamentoSchema);

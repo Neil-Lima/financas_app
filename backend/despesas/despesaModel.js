@@ -23,6 +23,6 @@ const despesaSchema = new mongoose.Schema({
     ref: 'Categoria',
     required: true,
   },
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model('Despesa', despesaSchema);

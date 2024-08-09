@@ -13,6 +13,6 @@ const categoriaSchema = new mongoose.Schema({
   subtipo: {
     type: String,
   },
-}, { timestamps: true });
+});
 
 module.exports = mongoose.model('Categoria', categoriaSchema);

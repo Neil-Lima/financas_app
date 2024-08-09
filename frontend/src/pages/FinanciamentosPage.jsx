@@ -3,9 +3,13 @@ import { Container, Row, Col, Card, Button, Form, Table, Modal, Alert } from 're
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faCheck, faTimes, faEye } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 import Layout from '../layout/Layout';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
+
+ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const StyledContainer = styled(Container)`
   padding: 20px;
@@ -25,9 +29,16 @@ const StyledCard = styled(Card)`
   }
 `;
 
+const ChartContainer = styled.div`
+  height: 300px;
+  width: 100%;
+  @media (max-width: 768px) {
+    height: 200px;
+  }
+`;
+
 const StyledTable = styled(Table)`
   color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
-  
   @media (max-width: 768px) {
     font-size: 0.8rem;
   }
@@ -41,13 +52,6 @@ const ResponsiveButton = styled(Button)`
   }
 `;
 
-const StyledModal = styled(Modal)`
-  .modal-content {
-    background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
-    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
-  }
-`;
-
 const ResponsiveCol = styled(Col)`
   @media (max-width: 768px) {
     margin-bottom: 1rem;
@@ -57,6 +61,13 @@ const ResponsiveCol = styled(Col)`
 const ResponsiveForm = styled(Form)`
   @media (max-width: 768px) {
     font-size: 0.9rem;
+  }
+`;
+
+const StyledModal = styled(Modal)`
+  .modal-content {
+    background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
+    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
   }
 `;
 
@@ -75,41 +86,15 @@ const FinanciamentosPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsFinanciamento, setDetailsFinanciamento] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
-  const [lastSync, setLastSync] = useState(null);
 
   useEffect(() => {
     fetchFinanciamentos();
   }, []);
 
-  useEffect(() => {
-    const syncInterval = setInterval(() => {
-      syncData();
-    }, 5000); // Sincroniza a cada 5 segundos
-
-    return () => clearInterval(syncInterval);
-  }, []);
-
-  const syncData = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await axios.get('https://financasappproject.netlify.app/api/sync', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (response.data.lastSync !== lastSync) {
-          setLastSync(response.data.lastSync);
-          fetchFinanciamentos();
-        }
-      } catch (error) {
-        console.error('Erro na sincronização:', error);
-      }
-    }
-  };
-
   const fetchFinanciamentos = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/financiamentos', {
+      const response = await axios.get('https://financas-app-kappa.vercel.app/api/financiamentos', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setFinanciamentos(response.data);
@@ -119,29 +104,19 @@ const FinanciamentosPage = () => {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
     setNewFinanciamento({ ...newFinanciamento, [name]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const formattedData = {
-        ...newFinanciamento,
-        data_inicio: new Date(newFinanciamento.data_inicio).toISOString()
-      };
-      await axios.post('https://financasappproject.netlify.app/api/financiamentos', formattedData, {
+      await axios.post('https://financas-app-kappa.vercel.app/api/financiamentos', newFinanciamento, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setNewFinanciamento({
-        descricao: '',
-        valor_total: '',
-        taxa_juros: '',
-        parcelas_totais: '',
-        data_inicio: ''
-      });
+      setNewFinanciamento({ descricao: '', valor_total: '', taxa_juros: '', parcelas_totais: '', data_inicio: '' });
       fetchFinanciamentos();
       showAlert('Financiamento adicionado com sucesso', 'success');
     } catch (error) {
@@ -152,22 +127,18 @@ const FinanciamentosPage = () => {
 
   const handleEdit = (financiamento) => {
     setEditingId(financiamento._id);
-    setEditedFinanciamento({...financiamento, data_inicio: new Date(financiamento.data_inicio).toISOString().split('T')[0]});
+    setEditedFinanciamento(financiamento);
   };
 
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
+  const handleEditChange = (event) => {
+    const { name, value } = event.target;
     setEditedFinanciamento({ ...editedFinanciamento, [name]: value });
   };
 
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      const formattedData = {
-        ...editedFinanciamento,
-        data_inicio: new Date(editedFinanciamento.data_inicio).toISOString()
-      };
-      await axios.put(`https://financasappproject.netlify.app/api/financiamentos/${editingId}`, formattedData, {
+      await axios.put(`https://financas-app-kappa.vercel.app/api/financiamentos/${editingId}`, editedFinanciamento, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -183,7 +154,7 @@ const FinanciamentosPage = () => {
     if (window.confirm('Tem certeza que deseja excluir este financiamento?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financasappproject.netlify.app/api/financiamentos/${id}`, {
+        await axios.delete(`https://financas-app-kappa.vercel.app/api/financiamentos/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchFinanciamentos();
@@ -205,8 +176,45 @@ const FinanciamentosPage = () => {
     setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString();
+  const chartData = {
+    labels: financiamentos.map(f => f.descricao),
+    datasets: [
+      {
+        label: 'Valor Total dos Financiamentos',
+        data: financiamentos.map(f => f.valor_total),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+      }
+    ]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: isDarkMode ? '#ffffff' : '#000000'
+        }
+      },
+      x: {
+        ticks: {
+          color: isDarkMode ? '#ffffff' : '#000000'
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: isDarkMode ? '#ffffff' : '#000000'
+        }
+      },
+      title: {
+        display: true,
+        text: 'Valor Total dos Financiamentos',
+        color: isDarkMode ? '#ffffff' : '#000000'
+      }
+    }
   };
 
   return (
@@ -302,6 +310,19 @@ const FinanciamentosPage = () => {
           </Col>
         </Row>
 
+        <Row className="mb-4">
+          <Col>
+            <StyledCard isDarkMode={isDarkMode}>
+              <Card.Body>
+                <Card.Title>Visão Geral de Financiamentos</Card.Title>
+                <ChartContainer>
+                  <Bar data={chartData} options={chartOptions} />
+                </ChartContainer>
+              </Card.Body>
+            </StyledCard>
+          </Col>
+        </Row>
+
         <Row>
           <Col>
             <StyledCard isDarkMode={isDarkMode}>
@@ -369,103 +390,100 @@ const FinanciamentosPage = () => {
                             ) : (
                               financiamento.parcelas_totais
                             )}
-                            </td>
-                            <td>
-                              {editingId === financiamento._id ? (
-                                <Form.Control
-                                  type="date"
-                                  name="data_inicio"
-                                  value={editedFinanciamento.data_inicio}
-                                  onChange={handleEditChange}
-                                />
-                              ) : (
-                                formatDate(financiamento.data_inicio)
-                              )}
-                            </td>
-                            <td>
-                              {editingId === financiamento._id ? (
-                                <>
-                                  <ResponsiveButton
-                                    variant="success"
-                                    size="sm"
-                                    onClick={handleSaveEdit}
-                                  >
-                                    <FontAwesomeIcon icon={faCheck} />
-                                  </ResponsiveButton>
-                                  <ResponsiveButton
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => setEditingId(null)}
-                                    className="ml-2"
-                                  >
-                                    <FontAwesomeIcon icon={faTimes} />
-                                  </ResponsiveButton>
-                                </>
-                              ) : (
-                                <>
-                                  <ResponsiveButton
-                                    variant="outline-primary"
-                                    size="sm"
-                                    className="mr-2"
-                                    onClick={() => handleEdit(financiamento)}
-                                  >
-                                    <FontAwesomeIcon icon={faEdit} />
-                                  </ResponsiveButton>
-                                  <ResponsiveButton
-                                    variant="outline-danger"
-                                    size="sm"
-                                    className="mr-2"
-                                    onClick={() => handleDelete(financiamento._id)}
-                                  >
-                                    <FontAwesomeIcon icon={faTrash} />
-                                  </ResponsiveButton>
-                                  <ResponsiveButton
-                                    variant="outline-info"
-                                    size="sm"
-                                    onClick={() => handleShowDetails(financiamento)}
-                                  >
-                                    <FontAwesomeIcon icon={faEye} />
-                                  </ResponsiveButton>
-                                </>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </StyledTable>
-                  </div>
-                </Card.Body>
-              </StyledCard>
-            </Col>
-          </Row>
-  
-          <StyledModal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} isDarkMode={isDarkMode}>
-            <Modal.Header closeButton>
-              <Modal.Title>Detalhes do Financiamento</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {detailsFinanciamento && (
-                <>
-                  <p><strong>Descrição:</strong> {detailsFinanciamento.descricao}</p>
-                  <p><strong>Valor Total:</strong> R$ {detailsFinanciamento.valor_total.toFixed(2)}</p>
-                  <p><strong>Taxa de Juros:</strong> {detailsFinanciamento.taxa_juros}%</p>
-                  <p><strong>Parcelas Totais:</strong> {detailsFinanciamento.parcelas_totais}</p>
-                  <p><strong>Data de Início:</strong> {formatDate(detailsFinanciamento.data_inicio)}</p>
-                  <p><strong>Data de Criação:</strong> {formatDate(detailsFinanciamento.createdAt)}</p>
-                  <p><strong>Última Atualização:</strong> {formatDate(detailsFinanciamento.updatedAt)}</p>
-                </>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>
-                Fechar
-              </Button>
-            </Modal.Footer>
-          </StyledModal>
-        </StyledContainer>
-      </Layout>
-    );
-  };
-  
-  export default FinanciamentosPage;
-  
+                          </td>
+                          <td>
+                            {editingId === financiamento._id ? (
+                              <Form.Control
+                                type="date"
+                                name="data_inicio"
+                                value={editedFinanciamento.data_inicio}
+                                onChange={handleEditChange}
+                              />
+                            ) : (
+                              new Date(financiamento.data_inicio).toLocaleDateString()
+                            )}
+                          </td>
+                          <td>
+                            {editingId === financiamento._id ? (
+                              <>
+                                <ResponsiveButton
+                                  variant="success"
+                                                                    size="sm"
+                                  onClick={handleSaveEdit}
+                                >
+                                  <FontAwesomeIcon icon={faCheck} />
+                                </ResponsiveButton>
+                                <ResponsiveButton
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => setEditingId(null)}
+                                  className="ml-2"
+                                >
+                                  <FontAwesomeIcon icon={faTimes} />
+                                </ResponsiveButton>
+                              </>
+                            ) : (
+                              <>
+                                <ResponsiveButton
+                                  variant="outline-primary"
+                                  size="sm"
+                                  onClick={() => handleEdit(financiamento)}
+                                >
+                                  <FontAwesomeIcon icon={faEdit} />
+                                </ResponsiveButton>
+                                <ResponsiveButton
+                                  variant="outline-danger"
+                                  size="sm"
+                                  onClick={() => handleDelete(financiamento._id)}
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </ResponsiveButton>
+                                <ResponsiveButton
+                                  variant="outline-info"
+                                  size="sm"
+                                  onClick={() => handleShowDetails(financiamento)}
+                                >
+                                  <FontAwesomeIcon icon={faEye} />
+                                </ResponsiveButton>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </StyledTable>
+                </div>
+              </Card.Body>
+            </StyledCard>
+          </Col>
+        </Row>
+
+        <StyledModal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} isDarkMode={isDarkMode}>
+          <Modal.Header closeButton>
+            <Modal.Title>Detalhes do Financiamento</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {detailsFinanciamento && (
+              <>
+                <p><strong>Descrição:</strong> {detailsFinanciamento.descricao}</p>
+                <p><strong>Valor Total:</strong> R$ {detailsFinanciamento.valor_total.toFixed(2)}</p>
+                <p><strong>Taxa de Juros:</strong> {detailsFinanciamento.taxa_juros}%</p>
+                <p><strong>Parcelas Totais:</strong> {detailsFinanciamento.parcelas_totais}</p>
+                <p><strong>Data de Início:</strong> {new Date(detailsFinanciamento.data_inicio).toLocaleDateString()}</p>
+                <p><strong>ID:</strong> {detailsFinanciamento._id}</p>
+              </>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>
+              Fechar
+            </Button>
+          </Modal.Footer>
+        </StyledModal>
+      </StyledContainer>
+    </Layout>
+  );
+};
+
+export default FinanciamentosPage;
+
