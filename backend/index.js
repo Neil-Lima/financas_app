@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const connectDB = require('./config/database');
 const { rateLimitMiddleware } = require('./middleware/Middleware');
+const syncController = require('./syncController');
 
 // Importação das rotas
 const usuarioRoutes = require('./usuarios/usuarioRoute');
@@ -28,6 +29,10 @@ app.use(helmet());
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(rateLimitMiddleware);
+app.use('/api/sync', syncController);
+
+
+
 
 // Rotas
 app.use('/api/usuarios', usuarioRoutes);
