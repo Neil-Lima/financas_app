@@ -35,6 +35,7 @@ import { Bar } from "react-chartjs-2";
 import Layout from "../layout/Layout";
 import axios from "axios";
 import { useTheme } from "../context/ThemeContext";
+import io from 'socket.io-client';
 
 ChartJS.register(
   ArcElement,
@@ -132,8 +133,18 @@ const OrcamentosPage = () => {
   const [showInstructionsModal, setShowInstructionsModal] = useState(false);
 
   useEffect(() => {
+    const socket = io('https://financas-app-kappa.vercel.app');
+    socket.on('orcamentos_atualizados', () => {
+      fetchOrcamentos();
+    });
+
     fetchOrcamentos();
     fetchCategorias();
+
+    return () => {
+      socket.off('orcamentos_atualizados');
+      socket.disconnect();
+    };
   }, []);
 
   const fetchOrcamentos = async () => {
@@ -430,8 +441,17 @@ const OrcamentosPage = () => {
                         />
                       </Form.Group>
                     </ResponsiveCol>
-                                   </Row>
-                  <Row className="mt-3">
+                    <ResponsiveCol xs={12} md={3}>
+                      <Form.Group>
+                        <Form.Label>Notas</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          name="notas"
+                          value={newOrcamento.notas}
+                          onChange={handleInputChange}
+                        />
+                      </Form.Group>
+                    </ResponsiveCol>
                     <ResponsiveCol xs={12} md={3}>
                       <Form.Group>
                         <Form.Label>Recorrência</Form.Label>
@@ -443,6 +463,7 @@ const OrcamentosPage = () => {
                         >
                           <option value="nao_recorrente">Não Recorrente</option>
                           <option value="mensal">Mensal</option>
+                          <option value="trimestral">Trimestral</option>
                           <option value="anual">Anual</option>
                         </Form.Control>
                       </Form.Group>
@@ -471,21 +492,15 @@ const OrcamentosPage = () => {
                         />
                       </Form.Group>
                     </ResponsiveCol>
-                    <ResponsiveCol xs={12} md={3}>
-                      <Form.Group>
-                        <Form.Label>Notas</Form.Label>
-                        <Form.Control
-                          as="textarea"
-                          name="notas"
-                          value={newOrcamento.notas}
-                          onChange={handleInputChange}
-                        />
-                      </Form.Group>
-                    </ResponsiveCol>
                   </Row>
-                  <Button variant="primary" type="submit" className="mt-3">
-                    <FontAwesomeIcon icon={faPlus} /> Adicionar Orçamento
-                  </Button>
+                  <ResponsiveButton
+                    variant="primary"
+                    type="submit"
+                    className="mt-3"
+                  >
+                    <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                    Adicionar Orçamento
+                  </ResponsiveButton>
                 </ResponsiveForm>
               </Card.Body>
             </StyledCard>
@@ -496,7 +511,7 @@ const OrcamentosPage = () => {
           <Col>
             <StyledCard isDarkMode={isDarkMode}>
               <Card.Body>
-                <Card.Title>Gráfico de Orçamentos</Card.Title>
+                <Card.Title>Visão Geral de Orçamentos</Card.Title>
                 <ChartContainer>
                   <Bar data={chartData} options={chartOptions} />
                 </ChartContainer>
@@ -507,73 +522,193 @@ const OrcamentosPage = () => {
 
         <Row className="mb-4">
           <Col>
+            <ResponsiveButton variant="info" onClick={handleCompararAnual}>
+              Comparar com Ano Anterior
+            </ResponsiveButton>
+          </Col>
+        </Row>
+
+        {comparacaoAnual && (
+          <Row className="mb-4">
+            <Col>
+              <StyledCard isDarkMode={isDarkMode}>
+                <Card.Body>
+                  <Card.Title>Comparação Anual</Card.Title>
+                  <Table striped bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>Categoria</th>
+                        <th>Ano Anterior</th>
+                        <th>Ano Atual</th>
+                        <th>Diferença</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {Object.entries(comparacaoAnual).map(([categoria, { anterior, atual }]) => (
+                        <tr key={categoria}>
+                          <td>{categoria}</td>
+                          <td>R$ {anterior.toFixed(2)}</td>
+                          <td>R$ {atual.toFixed(2)}</td>
+                          <td>R$ {(atual - anterior).toFixed(2)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </Card.Body>
+              </StyledCard>
+            </Col>
+          </Row>
+        )}
+
+        <Row>
+          <Col>
             <StyledCard isDarkMode={isDarkMode}>
               <Card.Body>
                 <Card.Title>Lista de Orçamentos</Card.Title>
-                <StyledTable striped bordered hover responsive isDarkMode={isDarkMode}>
-                  <thead>
-                    <tr>
-                      <th>Categoria</th>
-                      <th>Valor Planejado</th>
-                      <th>Valor Atual</th>
-                      <th>Valor Restante</th>
-                      <th>Mês/Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orcamentos.map((orcamento) => (
-                      <tr key={orcamento._id}>
-                        <td>{orcamento.categoria.nome}</td>
-                        <td>R$ {orcamento.valor_planejado.toFixed(2)}</td>
-                        <td>R$ {orcamento.valor_atual.toFixed(2)}</td>
-                        <td>R$ {orcamento.valor_restante.toFixed(2)}</td>
-                        <td>
-                          {orcamento.mes}/{orcamento.ano}
-                        </td>
-                        <td>
-                          {editingId === orcamento._id ? (
-                            <>
-                              <ResponsiveButton
-                                variant="success"
-                                onClick={handleSaveEdit}
-                              >
-                                <FontAwesomeIcon icon={faCheck} />
-                              </ResponsiveButton>
-                              <ResponsiveButton
-                                variant="secondary"
-                                onClick={() => setEditingId(null)}
-                              >
-                                <FontAwesomeIcon icon={faTimes} />
-                              </ResponsiveButton>
-                            </>
-                          ) : (
-                            <>
-                              <ResponsiveButton
-                                variant="info"
-                                onClick={() => handleShowDetails(orcamento)}
-                              >
-                                <FontAwesomeIcon icon={faEye} />
-                              </ResponsiveButton>
-                              <ResponsiveButton
-                                variant="warning"
-                                onClick={() => handleEdit(orcamento)}
-                              >
-                                <FontAwesomeIcon icon={faEdit} />
-                              </ResponsiveButton>
-                              <ResponsiveButton
-                                variant="danger"
-                                onClick={() => handleDelete(orcamento._id)}
-                              >
-                                <FontAwesomeIcon icon={faTrash} />
-                              </ResponsiveButton>
-                            </>
-                          )}
-                        </td>
+                <div className="table-responsive">
+                  <StyledTable
+                    striped
+                    hover
+                    variant={isDarkMode ? "dark" : "light"}
+                  >
+                    <thead>
+                      <tr>
+                        <th>Categoria</th>
+                        <th>Planejado</th>
+                        <th>Atual</th>
+                        <th>Restante</th>
+                        <th>Progresso</th>
+                        <th>Recorrência</th>
+                        <th>Prioridade</th>
+                        <th>Meta de Economia</th>
+                        <th>Ações</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </StyledTable>
+                    </thead>
+                    <tbody>
+                      {orcamentos.map((orcamento) => (
+                        <tr key={orcamento._id}>
+                          <td>
+                            {editingId === orcamento._id ? (
+                              <Form.Control
+                                as="select"
+                                name="categoria"
+                                value={editedOrcamento.categoria}
+                                onChange={handleEditChange}
+                              >
+                                {categorias.map((categoria) => (
+                                  <option
+                                    key={categoria._id}
+                                    value={categoria._id}
+                                  >
+                                    {categoria.nome}
+                                  </option>
+                                ))}
+                              </Form.Control>
+                            ) : (
+                              orcamento.categoria.nome
+                            )}
+                          </td>
+                          <td>
+                            {editingId === orcamento._id ? (
+                              <Form.Control
+                                type="number"
+                                name="valor_planejado"
+                                value={editedOrcamento.valor_planejado}
+                                onChange={handleEditChange}
+                              />
+                            ) : (
+                              `R$ ${orcamento.valor_planejado.toFixed(2)}`
+                            )}
+                          </td>
+                          <td>R$ {orcamento.valor_atual.toFixed(2)}</td>
+                          <td>R$ {orcamento.valor_restante.toFixed(2)}</td>
+                          <td>
+                            <div className="progress">
+                              <div
+                                className="progress-bar"
+                                role="progressbar"
+                                style={{
+                                  width: `${
+                                    (orcamento.valor_atual /
+                                      orcamento.valor_planejado) *
+                                    100
+                                  }%`,
+                                  backgroundColor:
+                                    orcamento.valor_atual >
+                                    orcamento.valor_planejado
+                                      ? "red"
+                                      : "green",
+                                }}
+                                aria-valuenow={
+                                  (orcamento.valor_atual /
+                                    orcamento.valor_planejado) *
+                                  100
+                                }
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                              >
+                                {(
+                                  (orcamento.valor_atual /
+                                    orcamento.valor_planejado) *
+                                  100
+                                ).toFixed(0)}
+                                %
+                              </div>
+                            </div>
+                          </td>
+                          <td>{orcamento.recorrencia}</td>
+                          <td>{orcamento.prioridade}</td>
+                          <td>R$ {orcamento.metaEconomia.toFixed(2)}</td>
+                          <td>
+                            {editingId === orcamento._id ? (
+                              <>
+                                <ResponsiveButton
+                                  variant="success"
+                                  size="sm"
+                                  onClick={handleSaveEdit}
+                                >
+                                  <FontAwesomeIcon icon={faCheck} />
+                                </ResponsiveButton>
+                                <ResponsiveButton
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => setEditingId(null)}
+                                  className="ml-2"
+                                >
+                                  <FontAwesomeIcon icon={faTimes} />
+                                </ResponsiveButton>
+                              </>
+                            ) : (
+                              <>
+                                <ResponsiveButton
+                                  variant="outline-primary"
+                                  size="sm"
+                                  onClick={() => handleEdit(orcamento)}
+                                >
+                                  <FontAwesomeIcon icon={faEdit} />
+                                </ResponsiveButton>
+                                <ResponsiveButton
+                                  variant="outline-danger"
+                                  size="sm"
+                                  onClick={() => handleDelete(orcamento._id)}
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </ResponsiveButton>
+                                <ResponsiveButton
+                                  variant="outline-info"
+                                  size="sm"
+                                  onClick={() => handleShowDetails(orcamento)}
+                                >
+                                  <FontAwesomeIcon icon={faEye} />
+                                </ResponsiveButton>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </StyledTable>
+                </div>
               </Card.Body>
             </StyledCard>
           </Col>
@@ -590,41 +725,25 @@ const OrcamentosPage = () => {
           <Modal.Body>
             {detailsOrcamento && (
               <>
-                <p>
-                  <strong>Categoria:</strong> {detailsOrcamento.categoria.nome}
-                </p>
-                <p>
-                  <strong>Valor Planejado:</strong> R${" "}
-                  {detailsOrcamento.valor_planejado.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Valor Atual:</strong> R${" "}
-                  {detailsOrcamento.valor_atual.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Valor Restante:</strong> R${" "}
-                  {detailsOrcamento.valor_restante.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Mês/Ano:</strong> {detailsOrcamento.mes}/
-                  {detailsOrcamento.ano}
-                </p>
-                <p>
-                  <strong>Recorrência:</strong> {detailsOrcamento.recorrencia}
-                </p>
-                <p>
-                  <strong>Prioridade:</strong> {detailsOrcamento.prioridade}
-                </p>
-                <p>
-                  <strong>Meta de Economia:</strong> R${" "}
-                  {detailsOrcamento.metaEconomia.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Notas:</strong> {detailsOrcamento.notas}
-                </p>
+                <p><strong>Categoria:</strong> {detailsOrcamento.categoria.nome}</p>
+                <p><strong>Valor Planejado:</strong> R$ {detailsOrcamento.valor_planejado.toFixed(2)}</p>
+                <p><strong>Valor Atual:</strong> R$ {detailsOrcamento.valor_atual.toFixed(2)}</p>
+                <p><strong>Valor Restante:</strong> R$ {detailsOrcamento.valor_restante.toFixed(2)}</p>
+                <p><strong>Mês:</strong> {detailsOrcamento.mes}</p>
+                <p><strong>Ano:</strong> {detailsOrcamento.ano}</p>
+                <p><strong>Notas:</strong> {detailsOrcamento.notas}</p>
+                <p><strong>Recorrência:</strong> {detailsOrcamento.recorrencia}</p>
+                <p><strong>Prioridade:</strong> {detailsOrcamento.prioridade}</p>
+                <p><strong>Meta de Economia:</strong> R$ {detailsOrcamento.metaEconomia.toFixed(2)}</p>
+                <p><strong>ID:</strong> {detailsOrcamento._id}</p>
               </>
             )}
           </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>
+              Fechar
+            </Button>
+          </Modal.Footer>
         </StyledModal>
 
         <StyledModal
@@ -633,28 +752,32 @@ const OrcamentosPage = () => {
           isDarkMode={isDarkMode}
         >
           <Modal.Header closeButton>
-            <Modal.Title>Instruções de Uso</Modal.Title>
+            <Modal.Title>Instruções</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <h5>Como usar a página de Orçamentos:</h5>
             <ol>
-              <li>
-                Para adicionar um novo orçamento, preencha o formulário "Novo
-                Orçamento" e clique em "Adicionar Orçamento".
-              </li>
-              <li>
-                Visualize seus orçamentos no gráfico e na tabela abaixo.
-              </li>
-              <li>
-                Use os botões de ação na tabela para ver detalhes, editar ou
-                excluir orçamentos.
-              </li>
-              <li>
-                Fique atento aos alertas de ultrapassagem de limites no topo da
-                página.
-              </li>
+              <li>Adicione um novo orçamento usando o formulário no topo da página.</li>
+              <li>Visualize seus orçamentos no gráfico e na tabela abaixo.</li>
+              <li>Edite ou exclua orçamentos existentes usando os botões na tabela.</li>
+              <li>Compare seus orçamentos com o ano anterior usando o botão "Comparar com Ano Anterior".</li>
             </ol>
+            <h5>Descrição dos campos:</h5>
+            <ul>
+              <li><strong>Categoria:</strong> A categoria do orçamento.</li>
+              <li><strong>Valor Planejado:</strong> O valor que você planeja gastar.</li>
+              <li><strong>Valor Atual:</strong> O valor que você já gastou.</li>
+              <li><strong>Valor Restante:</strong> A diferença entre o planejado e o atual.</li>
+              <li><strong>Recorrência:</strong> Se o orçamento se repete e com que frequência.</li>
+              <li><strong>Prioridade:</strong> A importância do orçamento (1-5).</li>
+              <li><strong>Meta de Economia:</strong> Quanto você pretende economizar nesta categoria.</li>
+            </ul>
           </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowInstructionsModal(false)}>
+              Fechar
+            </Button>
+          </Modal.Footer>
         </StyledModal>
       </StyledContainer>
     </Layout>
