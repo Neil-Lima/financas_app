@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Table, Modal, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Table, Modal, Spinner, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWallet, faChartLine, faExchangeAlt, faMoneyBillWave, faFileAlt, faSync } from '@fortawesome/free-solid-svg-icons';
+import { faWallet, faChartLine, faExchangeAlt, faMoneyBillWave, faFileAlt, faSync, faPlus, faEdit, faTrash, faCheck, faTimes, faEye } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../layout/Layout';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
-import { Line, Doughnut } from 'react-chartjs-2';
+import { Line, Doughnut, Bar, Pie } from 'react-chartjs-2';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -110,12 +110,26 @@ const HomePage = () => {
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
   const navigate = useNavigate();
+
+  // New state variables for different sections
+  const [contas, setContas] = useState([]);
+  const [despesas, setDespesas] = useState([]);
+  const [estoque, setEstoque] = useState([]);
+  const [financiamentos, setFinanciamentos] = useState([]);
+  const [metas, setMetas] = useState([]);
+  const [orcamentos, setOrcamentos] = useState([]);
+  const [parcelamentos, setParcelamentos] = useState([]);
+  const [transacoes, setTransacoes] = useState([]);
+  const [categorias, setCategorias] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
+    } else {
+      fetchData();
     }
   }, [navigate]);
 
@@ -123,7 +137,19 @@ const HomePage = () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const [resumoResponse, reportResponse] = await Promise.all([
+      const [
+        resumoResponse,
+        reportResponse,
+        contasResponse,
+        despesasResponse,
+        estoqueResponse,
+        financiamentosResponse,
+        metasResponse,
+        orcamentosResponse,
+        parcelamentosResponse,
+        transacoesResponse,
+        categoriasResponse
+      ] = await Promise.all([
         axios.get('https://financas-app-kappa.vercel.app/api/resumo', {
           headers: { Authorization: `Bearer ${token}` },
           params: { startDate: startDate.toISOString(), endDate: endDate.toISOString() }
@@ -131,15 +157,58 @@ const HomePage = () => {
         axios.get('https://financas-app-kappa.vercel.app/api/relatorios/completo', {
           headers: { Authorization: `Bearer ${token}` },
           params: { startDate: startDate.toISOString(), endDate: endDate.toISOString() }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/contas', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/despesas', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/estoque', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/financiamentos', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/metas', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/orcamentos', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/parcelamentos', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/transacoes', {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get('https://financas-app-kappa.vercel.app/api/categorias', {
+          headers: { Authorization: `Bearer ${token}` }
         })
       ]);
+
       setResumo(resumoResponse.data);
       setReportData(reportResponse.data);
+      setContas(contasResponse.data);
+      setDespesas(despesasResponse.data);
+      setEstoque(estoqueResponse.data);
+      setFinanciamentos(financiamentosResponse.data);
+      setMetas(metasResponse.data);
+      setOrcamentos(orcamentosResponse.data);
+      setParcelamentos(parcelamentosResponse.data);
+      setTransacoes(transacoesResponse.data);
+      setCategorias(categoriasResponse.data);
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
+      showAlert('Erro ao buscar dados', 'danger');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const showAlert = (message, variant) => {
+    setAlert({ show: true, message, variant });
+    setTimeout(() => setAlert({ show: false, message: '', variant: 'success' }), 3000);
   };
 
   const renderResumoFinanceiro = () => {
@@ -188,33 +257,31 @@ const HomePage = () => {
   };
 
   const renderGraficos = () => {
-    const emptyData = {
-      labels: [],
-      datasets: [{ data: [] }]
-    };
-
-    const fluxoCaixaData = reportData ? {
-      labels: reportData.fluxoCaixa.map(item => item.mes),
+    const fluxoCaixaData = {
+      labels: reportData ? reportData.fluxoCaixa.map(item => item.mes) : [],
       datasets: [
         {
           label: 'Receitas',
-          data: reportData.fluxoCaixa.map(item => item.receitas),
+          data: reportData ? reportData.fluxoCaixa.map(item => item.receitas) : [],
           borderColor: 'rgb(75, 192, 192)',
           backgroundColor: 'rgba(75, 192, 192, 0.5)',
         },
         {
           label: 'Despesas',
-          data: reportData.fluxoCaixa.map(item => item.despesas),
+          data: reportData ? reportData.fluxoCaixa.map(item => item.despesas) : [],
           borderColor: 'rgb(255, 99, 132)',
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         }
       ]
-    } : emptyData;
+    };
 
-    const categoriasData = reportData ? {
-      labels: reportData.transacoesPorCategoria.map(item => item.categoria),
+    const categoriasData = {
+      labels: categorias.map(categoria => categoria.nome),
       datasets: [{
-        data: reportData.transacoesPorCategoria.map(item => item.total),
+        data: categorias.map(categoria => 
+          despesas.filter(despesa => despesa.categoria === categoria._id)
+            .reduce((acc, curr) => acc + curr.valor, 0)
+        ),
         backgroundColor: [
           'rgba(255, 99, 132, 0.6)',
           'rgba(54, 162, 235, 0.6)',
@@ -223,9 +290,31 @@ const HomePage = () => {
           'rgba(153, 102, 255, 0.6)',
         ],
       }]
-    } : emptyData;
+    };
 
-    return (
+    const metasData = {
+      labels: metas.map(meta => meta.descricao),
+      datasets: [
+        {
+          label: 'Progresso',
+          data: metas.map(meta => (meta.valor_atual / meta.valor_alvo) * 100),
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        }
+      ]
+    };
+
+    const estoqueData = {
+      labels: estoque.map(item => item.nome),
+      datasets: [
+        {
+          label: 'Quantidade em Estoque',
+          data: estoque.map(item => item.quantidade),
+          backgroundColor: 'rgba(153, 102, 255, 0.6)',
+        }
+      ]
+    };
+
+     return (
       <StyledRow>
         <StyledCol md={6}>
           <StyledCard isDarkMode={isDarkMode}>
@@ -240,9 +329,29 @@ const HomePage = () => {
         <StyledCol md={6}>
           <StyledCard isDarkMode={isDarkMode}>
             <Card.Body>
-              <Card.Title>Transações por Categoria</Card.Title>
+              <Card.Title>Despesas por Categoria</Card.Title>
               <ChartContainer>
                 <Doughnut data={categoriasData} options={{ responsive: true, maintainAspectRatio: false }} />
+              </ChartContainer>
+            </Card.Body>
+          </StyledCard>
+        </StyledCol>
+        <StyledCol md={6}>
+          <StyledCard isDarkMode={isDarkMode}>
+            <Card.Body>
+              <Card.Title>Progresso das Metas</Card.Title>
+              <ChartContainer>
+                <Bar data={metasData} options={{ responsive: true, maintainAspectRatio: false }} />
+              </ChartContainer>
+            </Card.Body>
+          </StyledCard>
+        </StyledCol>
+        <StyledCol md={6}>
+          <StyledCard isDarkMode={isDarkMode}>
+            <Card.Body>
+              <Card.Title>Visão Geral do Estoque</Card.Title>
+              <ChartContainer>
+                <Bar data={estoqueData} options={{ responsive: true, maintainAspectRatio: false }} />
               </ChartContainer>
             </Card.Body>
           </StyledCard>
@@ -370,6 +479,12 @@ const HomePage = () => {
   return (
     <Layout>
       <StyledContainer>
+        {alert.show && (
+          <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
+            {alert.message}
+          </Alert>
+        )}
+
         <StyledRow className="mb-4">
           <Col>
             <h2>Dashboard</h2>
@@ -418,3 +533,4 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
