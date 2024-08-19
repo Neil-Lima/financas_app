@@ -82,7 +82,7 @@ const TransacoesPage = () => {
   const fetchTransacoes = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/transacoes', {
+      const response = await axios.get('https://financas-app-kappa.vercel.app/api/transacoes', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setTransacoes(response.data);
@@ -95,7 +95,7 @@ const TransacoesPage = () => {
   const fetchContas = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/contas', {
+      const response = await axios.get('https://financas-app-kappa.vercel.app/api/contas', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setContas(response.data);
@@ -107,7 +107,7 @@ const TransacoesPage = () => {
   const fetchCategorias = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('https://financasappproject.netlify.app/api/categorias', {
+      const response = await axios.get('https://financas-app-kappa.vercel.app/api/categorias', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCategorias(response.data);
@@ -131,7 +131,7 @@ const TransacoesPage = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      await axios.post('https://financasappproject.netlify.app/api/transacoes', newTransacao, {
+      await axios.post('https://financas-app-kappa.vercel.app/api/transacoes', newTransacao, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewTransacao({ conta: '', categoria: '', descricao: '', valor: '', data: '', tipo: '' });
@@ -156,7 +156,7 @@ const TransacoesPage = () => {
   const handleSaveEdit = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put(`https://financasappproject.netlify.app/api/transacoes/${editingId}`, editedTransacao, {
+      await axios.put(`https://financas-app-kappa.vercel.app/api/transacoes/${editingId}`, editedTransacao, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEditingId(null);
@@ -172,7 +172,7 @@ const TransacoesPage = () => {
     if (window.confirm('Tem certeza que deseja excluir esta transação?')) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`https://financasappproject.netlify.app/api/transacoes/${id}`, {
+        await axios.delete(`https://financas-app-kappa.vercel.app/api/transacoes/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchTransacoes();
@@ -336,7 +336,7 @@ const TransacoesPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Array.isArray(transacoes) && transacoes.map((transacao) => (
+                      {transacoes.map((transacao) => (
                         <tr key={transacao._id}>
                           <td>
                             {editingId === transacao._id ? (
