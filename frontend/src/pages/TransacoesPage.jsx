@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Row, Col, Card, Button, Form, Table, Modal, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faCheck, faTimes, faEye } from '@fortawesome/free-solid-svg-icons';
@@ -79,13 +79,7 @@ const TransacoesPage = () => {
   const [detailsTransacao, setDetailsTransacao] = useState(null);
   const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
 
-  useEffect(() => {
-    fetchTransacoes();
-    fetchContas();
-    fetchCategorias();
-  }, []);
-
-  const fetchTransacoes = async () => {
+  const fetchTransacoes = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get('https://financasappproject.netlify.app/api/transacoes', {
@@ -96,9 +90,9 @@ const TransacoesPage = () => {
       console.error('Erro ao buscar transações:', error);
       showAlert('Erro ao buscar transações', 'danger');
     }
-  };
+  }, []);
 
-  const fetchContas = async () => {
+  const fetchContas = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get('https://financasappproject.netlify.app/api/contas', {
@@ -108,9 +102,9 @@ const TransacoesPage = () => {
     } catch (error) {
       console.error('Erro ao buscar contas:', error);
     }
-  };
+  }, []);
 
-  const fetchCategorias = async () => {
+  const fetchCategorias = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get('https://financasappproject.netlify.app/api/categorias', {
@@ -120,7 +114,13 @@ const TransacoesPage = () => {
     } catch (error) {
       console.error('Erro ao buscar categorias:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTransacoes();
+    fetchContas();
+    fetchCategorias();
+  }, [fetchTransacoes, fetchContas, fetchCategorias]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -336,7 +336,7 @@ const TransacoesPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {transacoes.map((transacao) => (
+                      {Array.isArray(transacoes) && transacoes.map((transacao) => (
                         <tr key={transacao._id}>
                           <td>
                             {editingId === transacao._id ? (
