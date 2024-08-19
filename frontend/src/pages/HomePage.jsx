@@ -19,8 +19,8 @@ const StyledCard = styled(Card)`
   border: none;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
-  color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
+  background-color: ${props => props.$isDarkMode ? '#2c2c2c' : '#ffffff'};
+  color: ${props => props.$isDarkMode ? '#ffffff' : '#000000'};
   margin-bottom: 30px;
 `;
 
@@ -43,30 +43,30 @@ const StyledButton = styled(Button)`
 `;
 
 const StyledTable = styled(Table)`
-  color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
-  background-color: ${props => props.isDarkMode ? '#1e1e1e' : '#ffffff'};
+  color: ${props => props.$isDarkMode ? '#ffffff' : '#000000'};
+  background-color: ${props => props.$isDarkMode ? '#1e1e1e' : '#ffffff'};
 
   th, td {
-    border-color: ${props => props.isDarkMode ? '#444' : '#dee2e6'};
+    border-color: ${props => props.$isDarkMode ? '#444' : '#dee2e6'};
     padding: 12px;
-    background-color: ${props => props.isDarkMode ? '#1e1e1e' : '#ffffff'};
-    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
+    background-color: ${props => props.$isDarkMode ? '#1e1e1e' : '#ffffff'};
+    color: ${props => props.$isDarkMode ? '#ffffff' : '#000000'};
   }
 
   tbody tr:nth-of-type(odd) {
-    background-color: ${props => props.isDarkMode ? '#2a2a2a' : '#f8f9fa'};
+    background-color: ${props => props.$isDarkMode ? '#2a2a2a' : '#f8f9fa'};
   }
 
   tbody tr:hover {
-    background-color: ${props => props.isDarkMode ? '#3a3a3a' : '#e9ecef'};
+    background-color: ${props => props.$isDarkMode ? '#3a3a3a' : '#e9ecef'};
   }
 
   .text-success {
-    color: ${props => props.isDarkMode ? '#4caf50' : '#28a745'} !important;
+    color: ${props => props.$isDarkMode ? '#4caf50' : '#28a745'} !important;
   }
 
   .text-danger {
-    color: ${props => props.isDarkMode ? '#f44336' : '#dc3545'} !important;
+    color: ${props => props.$isDarkMode ? '#f44336' : '#dc3545'} !important;
   }
 `;
 
@@ -80,20 +80,20 @@ const StyledCol = styled(Col)`
 
 const StyledModal = styled(Modal)`
   .modal-content {
-    background-color: ${props => props.isDarkMode ? '#2c2c2c' : '#ffffff'};
-    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
+    background-color: ${props => props.$isDarkMode ? '#2c2c2c' : '#ffffff'};
+    color: ${props => props.$isDarkMode ? '#ffffff' : '#000000'};
   }
 
   .modal-header {
-    border-bottom-color: ${props => props.isDarkMode ? '#444' : '#dee2e6'};
+    border-bottom-color: ${props => props.$isDarkMode ? '#444' : '#dee2e6'};
   }
 
   .modal-footer {
-    border-top-color: ${props => props.isDarkMode ? '#444' : '#dee2e6'};
+    border-top-color: ${props => props.$isDarkMode ? '#444' : '#dee2e6'};
   }
 
   .close {
-    color: ${props => props.isDarkMode ? '#ffffff' : '#000000'};
+    color: ${props => props.$isDarkMode ? '#ffffff' : '#000000'};
   }
 `;
 
@@ -113,7 +113,6 @@ const HomePage = () => {
   const [alert, setAlert] = useState({ show: false, message: '', variant: 'success' });
   const navigate = useNavigate();
 
-  // New state variables for different sections
   const [contas, setContas] = useState([]);
   const [despesas, setDespesas] = useState([]);
   const [estoque, setEstoque] = useState([]);
@@ -138,8 +137,6 @@ const HomePage = () => {
     try {
       const token = localStorage.getItem('token');
       const [
-        resumoResponse,
-        reportResponse,
         contasResponse,
         despesasResponse,
         estoqueResponse,
@@ -150,14 +147,6 @@ const HomePage = () => {
         transacoesResponse,
         categoriasResponse
       ] = await Promise.all([
-        axios.get('https://financas-app-kappa.vercel.app/api/resumo', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { startDate: startDate.toISOString(), endDate: endDate.toISOString() }
-        }),
-        axios.get('https://financas-app-kappa.vercel.app/api/relatorios/completo', {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { startDate: startDate.toISOString(), endDate: endDate.toISOString() }
-        }),
         axios.get('https://financas-app-kappa.vercel.app/api/contas', {
           headers: { Authorization: `Bearer ${token}` }
         }),
@@ -187,8 +176,6 @@ const HomePage = () => {
         })
       ]);
 
-      setResumo(resumoResponse.data);
-      setReportData(reportResponse.data);
       setContas(contasResponse.data);
       setDespesas(despesasResponse.data);
       setEstoque(estoqueResponse.data);
@@ -198,6 +185,40 @@ const HomePage = () => {
       setParcelamentos(parcelamentosResponse.data);
       setTransacoes(transacoesResponse.data);
       setCategorias(categoriasResponse.data);
+
+      // Calcular resumo
+      const saldoTotal = contas.reduce((acc, conta) => acc + conta.saldo, 0);
+      const receitasMes = transacoes.filter(t => t.tipo === 'receita').reduce((acc, t) => acc + t.valor, 0);
+      const despesasMes = transacoes.filter(t => t.tipo === 'despesa').reduce((acc, t) => acc + t.valor, 0);
+      const transacoesRecentes = transacoes.slice(0, 5);
+
+      setResumo({
+        saldoTotal,
+        receitasMes,
+        despesasMes,
+        transacoesRecentes
+      });
+
+      // Calcular dados para relatório
+      const reportData = {
+        resumoFinanceiro: {
+          receita_total: receitasMes,
+          despesa_total: despesasMes,
+          saldo_total: saldoTotal
+        },
+        progressoMetas: metas.map(meta => ({
+          descricao: meta.descricao,
+          valor_atual: meta.valor_atual,
+          valor_alvo: meta.valor_alvo
+        })),
+        desempenhoOrcamentos: orcamentos.map(orcamento => ({
+          categoria: categorias.find(c => c._id === orcamento.categoria)?.nome || 'Desconhecida',
+          valor_planejado: orcamento.valor_planejado,
+          valor_atual: despesas.filter(d => d.categoria === orcamento.categoria).reduce((acc, d) => acc + d.valor, 0)
+        }))
+      };
+      setReportData(reportData);
+
     } catch (error) {
       console.error('Erro ao buscar dados:', error);
       showAlert('Erro ao buscar dados', 'danger');
@@ -214,7 +235,7 @@ const HomePage = () => {
   const renderResumoFinanceiro = () => {
     const { saldoTotal, receitasMes, despesasMes } = resumo;
     return (
-      <StyledCard isDarkMode={isDarkMode}>
+      <StyledCard $isDarkMode={isDarkMode}>
         <Card.Body>
           <Card.Title>Resumo Financeiro</Card.Title>
           <StyledRow>
@@ -258,17 +279,23 @@ const HomePage = () => {
 
   const renderGraficos = () => {
     const fluxoCaixaData = {
-      labels: reportData ? reportData.fluxoCaixa.map(item => item.mes) : [],
+      labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
       datasets: [
         {
           label: 'Receitas',
-          data: reportData ? reportData.fluxoCaixa.map(item => item.receitas) : [],
+          data: new Array(12).fill(0).map((_, i) => 
+            transacoes.filter(t => t.tipo === 'receita' && new Date(t.data).getMonth() === i)
+              .reduce((acc, t) => acc + t.valor, 0)
+          ),
           borderColor: 'rgb(75, 192, 192)',
           backgroundColor: 'rgba(75, 192, 192, 0.5)',
         },
         {
           label: 'Despesas',
-          data: reportData ? reportData.fluxoCaixa.map(item => item.despesas) : [],
+          data: new Array(12).fill(0).map((_, i) => 
+            transacoes.filter(t => t.tipo === 'despesa' && new Date(t.data).getMonth() === i)
+              .reduce((acc, t) => acc + t.valor, 0)
+          ),
           borderColor: 'rgb(255, 99, 132)',
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         }
@@ -314,10 +341,10 @@ const HomePage = () => {
       ]
     };
 
-     return (
+    return (
       <StyledRow>
         <StyledCol md={6}>
-          <StyledCard isDarkMode={isDarkMode}>
+          <StyledCard $isDarkMode={isDarkMode}>
             <Card.Body>
               <Card.Title>Fluxo de Caixa</Card.Title>
               <ChartContainer>
@@ -327,7 +354,7 @@ const HomePage = () => {
           </StyledCard>
         </StyledCol>
         <StyledCol md={6}>
-          <StyledCard isDarkMode={isDarkMode}>
+          <StyledCard $isDarkMode={isDarkMode}>
             <Card.Body>
               <Card.Title>Despesas por Categoria</Card.Title>
               <ChartContainer>
@@ -337,7 +364,7 @@ const HomePage = () => {
           </StyledCard>
         </StyledCol>
         <StyledCol md={6}>
-          <StyledCard isDarkMode={isDarkMode}>
+          <StyledCard $isDarkMode={isDarkMode}>
             <Card.Body>
               <Card.Title>Progresso das Metas</Card.Title>
               <ChartContainer>
@@ -347,7 +374,7 @@ const HomePage = () => {
           </StyledCard>
         </StyledCol>
         <StyledCol md={6}>
-          <StyledCard isDarkMode={isDarkMode}>
+          <StyledCard $isDarkMode={isDarkMode}>
             <Card.Body>
               <Card.Title>Visão Geral do Estoque</Card.Title>
               <ChartContainer>
@@ -362,10 +389,10 @@ const HomePage = () => {
 
   const renderTransacoesRecentes = () => {
     return (
-      <StyledCard isDarkMode={isDarkMode}>
+      <StyledCard $isDarkMode={isDarkMode}>
         <Card.Body>
           <Card.Title>Transações Recentes</Card.Title>
-          <StyledTable striped bordered hover responsive isDarkMode={isDarkMode}>
+          <StyledTable striped bordered hover responsive $isDarkMode={isDarkMode}>
             <thead>
               <tr>
                 <th>Data</th>
@@ -404,7 +431,7 @@ const HomePage = () => {
         show={showReportModal} 
         onHide={() => setShowReportModal(false)} 
         size="lg"
-        isDarkMode={isDarkMode}
+        $isDarkMode={isDarkMode}
       >
         <Modal.Header closeButton>
           <Modal.Title>Relatório Financeiro Completo</Modal.Title>
@@ -418,7 +445,7 @@ const HomePage = () => {
               <p>Saldo Total: R$ {reportData.resumoFinanceiro.saldo_total.toFixed(2)}</p>
 
               <h5>Progresso das Metas</h5>
-              <StyledTable striped bordered hover isDarkMode={isDarkMode}>
+              <StyledTable striped bordered hover $isDarkMode={isDarkMode}>
                 <thead>
                   <tr>
                     <th>Descrição</th>
@@ -440,7 +467,7 @@ const HomePage = () => {
               </StyledTable>
 
               <h5>Desempenho dos Orçamentos</h5>
-              <StyledTable striped bordered hover isDarkMode={isDarkMode}>
+              <StyledTable striped bordered hover $isDarkMode={isDarkMode}>
                 <thead>
                   <tr>
                     <th>Categoria</th>
@@ -490,7 +517,7 @@ const HomePage = () => {
             <h2>Dashboard</h2>
           </Col>
           <Col xs="auto">
-            <Form inline>
+            <Form>
               <StyledDatePicker
                 selected={startDate}
                 onChange={date => setStartDate(date)}
