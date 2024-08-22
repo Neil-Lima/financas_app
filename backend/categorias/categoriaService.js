@@ -1,16 +1,17 @@
 const Categoria = require('./categoriaModel');
 
 const categoriasPredefinidas = [
-  { nome: 'Alimentação', tipo: 'despesa', subtipo: 'Essencial' },
-  { nome: 'Moradia', tipo: 'despesa', subtipo: 'Essencial' },
-  { nome: 'Transporte', tipo: 'despesa', subtipo: 'Essencial' },
-  { nome: 'Saúde', tipo: 'despesa', subtipo: 'Essencial' },
-  { nome: 'Educação', tipo: 'despesa', subtipo: 'Investimento' },
-  { nome: 'Lazer', tipo: 'despesa', subtipo: 'Não essencial' },
-  { nome: 'Vestuário', tipo: 'despesa', subtipo: 'Não essencial' },
-  { nome: 'Salário', tipo: 'receita', subtipo: 'Fixo' },
-  { nome: 'Investimentos', tipo: 'receita', subtipo: 'Variável' },
-  { nome: 'Freelance', tipo: 'receita', subtipo: 'Variável' },
+  { nome: 'Alimentação', tipo: 'despesa', subtipo: 'Essencial', icone: 'fa-utensils' },
+  { nome: 'Moradia', tipo: 'despesa', subtipo: 'Essencial', icone: 'fa-home' },
+  { nome: 'Transporte', tipo: 'despesa', subtipo: 'Essencial', icone: 'fa-car' },
+  { nome: 'Saúde', tipo: 'despesa', subtipo: 'Essencial', icone: 'fa-medkit' },
+  { nome: 'Educação', tipo: 'despesa', subtipo: 'Investimento', icone: 'fa-graduation-cap' },
+  { nome: 'Lazer', tipo: 'despesa', subtipo: 'Não essencial', icone: 'fa-gamepad' },
+  { nome: 'Vestuário', tipo: 'despesa', subtipo: 'Não essencial', icone: 'fa-tshirt' },
+  { nome: 'Pet', tipo: 'despesa', subtipo: 'Essencial', icone: 'fa-paw' },
+  { nome: 'Salário', tipo: 'receita', subtipo: 'Fixo', icone: 'fa-money-bill-wave' },
+  { nome: 'Investimentos', tipo: 'receita', subtipo: 'Variável', icone: 'fa-chart-line' },
+  { nome: 'Freelance', tipo: 'receita', subtipo: 'Variável', icone: 'fa-laptop-code' },
 ];
 
 const inicializarCategorias = async () => {
@@ -22,9 +23,8 @@ const inicializarCategorias = async () => {
         { upsert: true, new: true }
       );
     }
-    
   } catch (error) {
-    
+    console.error('Erro ao inicializar categorias:', error);
   }
 };
 
