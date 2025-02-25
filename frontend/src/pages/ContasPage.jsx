@@ -142,7 +142,7 @@ const ContasPage = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Tem certeza que deseja excluir esta conta?')) {
+    if (window.confirm('Tem certeza que deseja excluir esta conta?')) {//,
       try {
         const token = localStorage.getItem('token');
         await axios.delete(`https://financasappproject.netlify.app/api/contas/${id}`, {
