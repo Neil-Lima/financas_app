@@ -1,20 +1,20 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import NavbarComp from '../components/NavbarComp';
-import SidebarComp from '../components/SidebarComp';
+import Navbar from '../shared/components/Navbar';
+import Sidebar from '../shared/components/Sidebar';
+import { useTheme } from '../shared/contexts/ThemeContext';
 import styled from 'styled-components';
-import { useTheme } from '../context/ThemeContext';
 
-const StyledContainer = styled(Container)`
-  background-color: ${props => props.isDarkMode ? '#121212' : '#ffffff'};
+const MainContent = styled.main`
+  margin-left: 250px;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
   min-height: 100vh;
-`;
+  background-color: ${props => props.$isDarkMode ? '#1a1a1a' : '#f8f9fa'};
+  color: ${props => props.$isDarkMode ? '#ffffff' : '#000000'};
 
-const MainContent = styled.div`
-  transition: margin-left 0.3s ease-in-out;
-
-  @media (min-width: 769px) {
-    margin-left: 250px;
+  @media (max-width: 768px) {
+    margin-left: 0;
   }
 `;
 
@@ -22,15 +22,15 @@ const Layout = ({ children }) => {
   const { isDarkMode } = useTheme();
 
   return (
-    <StyledContainer fluid className="p-0" isDarkMode={isDarkMode}>
-      <SidebarComp />
-      <MainContent>
-        <NavbarComp />
+    <>
+      <Sidebar />
+      <MainContent $isDarkMode={isDarkMode}>
+        <Navbar />
         <Container fluid>
           {children}
         </Container>
       </MainContent>
-    </StyledContainer>
+    </>
   );
 };
 

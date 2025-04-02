@@ -12,23 +12,73 @@ import ParcelamentosPage from '../pages/ParcelamentosPage'
 import FinanciamentosPage from '../pages/FinanciamentosPage'
 import EstoquePage from '../pages/EstoquePage'
 import UsuariosPage from '../pages/UsuariosPage'
+import Layout from '../layout/Layout'
 
 function Rotas() {
+  // Componente de rota com Layout
+  const PrivateRoute = ({ children }) => {
+    return <Layout>{children}</Layout>
+  }
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/metas" element={<MetasPage />} />
-        <Route path="/orcamentos" element={<OrcamentosPage />} />
-        <Route path="/relatorios" element={<RelatoriosPage />} />
-        <Route path="/transacoes" element={<TransacoesPage />} />
-        <Route path="/contas" element={<ContasPage />} />
-        <Route path="/despesas" element={<DespesaPage />} />
-        <Route path="/parcelamentos" element={<ParcelamentosPage/>} />
-        <Route path="/financiamentos" element={<FinanciamentosPage/>} />
-        <Route path="/estoque" element={<EstoquePage/>} />
-        <Route path="/usuarios" element={<UsuariosPage/>} /> 
+        <Route path="/home" element={
+          <PrivateRoute>
+            <HomePage />
+          </PrivateRoute>
+        } />
+        <Route path="/metas" element={
+          <PrivateRoute>
+            <MetasPage />
+          </PrivateRoute>
+        } />
+        <Route path="/orcamentos" element={
+          <PrivateRoute>
+            <OrcamentosPage />
+          </PrivateRoute>
+        } />
+        <Route path="/relatorios" element={
+          <PrivateRoute>
+            <RelatoriosPage />
+          </PrivateRoute>
+        } />
+        <Route path="/transacoes" element={
+          <PrivateRoute>
+            <TransacoesPage />
+          </PrivateRoute>
+        } />
+        <Route path="/contas" element={
+          <PrivateRoute>
+            <ContasPage />
+          </PrivateRoute>
+        } />
+        <Route path="/despesas" element={
+          <PrivateRoute>
+            <DespesaPage />
+          </PrivateRoute>
+        } />
+        <Route path="/parcelamentos" element={
+          <PrivateRoute>
+            <ParcelamentosPage/>
+          </PrivateRoute>
+        } />
+        <Route path="/financiamentos" element={
+          <PrivateRoute>
+            <FinanciamentosPage/>
+          </PrivateRoute>
+        } />
+        <Route path="/estoque" element={
+          <PrivateRoute>
+            <EstoquePage/>
+          </PrivateRoute>
+        } />
+        <Route path="/usuarios" element={
+          <PrivateRoute>
+            <UsuariosPage/>
+          </PrivateRoute>
+        } /> 
       </Routes>
     </BrowserRouter>
   )

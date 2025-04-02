@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Button, Form, Table, Modal, Spinner, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWallet, faChartLine, faExchangeAlt, faMoneyBillWave, faFileAlt, faSync, faPlus, faEdit, faTrash, faCheck, faTimes, faEye } from '@fortawesome/free-solid-svg-icons';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../layout/Layout';
 import axios from 'axios';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../shared/contexts/ThemeContext';
 import { Line, Doughnut, Bar, Pie } from 'react-chartjs-2';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -122,6 +121,12 @@ const HomePage = () => {
   const [parcelamentos, setParcelamentos] = useState([]);
   const [transacoes, setTransacoes] = useState([]);
   const [categorias, setCategorias] = useState([]);
+
+  // Refs para os gráficos
+  const fluxoCaixaRef = useRef(null);
+  const categoriaRef = useRef(null);
+  const metasRef = useRef(null);
+  const estoqueRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -341,6 +346,16 @@ const HomePage = () => {
       ]
     };
 
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+        },
+      },
+    };
+
     return (
       <StyledRow>
         <StyledCol md={6}>
@@ -348,7 +363,12 @@ const HomePage = () => {
             <Card.Body>
               <Card.Title>Fluxo de Caixa</Card.Title>
               <ChartContainer>
-                <Line data={fluxoCaixaData} options={{ responsive: true, maintainAspectRatio: false }} />
+                <Line 
+                  data={fluxoCaixaData} 
+                  options={chartOptions} 
+                  key="fluxocaixa"
+                  id="fluxocaixa"
+                />
               </ChartContainer>
             </Card.Body>
           </StyledCard>
@@ -358,7 +378,12 @@ const HomePage = () => {
             <Card.Body>
               <Card.Title>Despesas por Categoria</Card.Title>
               <ChartContainer>
-                <Doughnut data={categoriasData} options={{ responsive: true, maintainAspectRatio: false }} />
+                <Doughnut 
+                  data={categoriasData} 
+                  options={chartOptions} 
+                  key="categorias"
+                  id="categorias"
+                />
               </ChartContainer>
             </Card.Body>
           </StyledCard>
@@ -368,7 +393,12 @@ const HomePage = () => {
             <Card.Body>
               <Card.Title>Progresso das Metas</Card.Title>
               <ChartContainer>
-                <Bar data={metasData} options={{ responsive: true, maintainAspectRatio: false }} />
+                <Bar 
+                  data={metasData} 
+                  options={chartOptions} 
+                  key="metas"
+                  id="metas"
+                />
               </ChartContainer>
             </Card.Body>
           </StyledCard>
@@ -378,7 +408,12 @@ const HomePage = () => {
             <Card.Body>
               <Card.Title>Visão Geral do Estoque</Card.Title>
               <ChartContainer>
-                <Bar data={estoqueData} options={{ responsive: true, maintainAspectRatio: false }} />
+                <Bar 
+                  data={estoqueData} 
+                  options={chartOptions} 
+                  key="estoque"
+                  id="estoque"
+                />
               </ChartContainer>
             </Card.Body>
           </StyledCard>
@@ -503,59 +538,76 @@ const HomePage = () => {
     );
   };
 
+  // Função para limpar gráficos quando o componente for desmontado
+  useEffect(() => {
+    return () => {
+      // Destruir as instâncias de gráfico quando o componente for desmontado
+      if (fluxoCaixaRef.current) {
+        fluxoCaixaRef.current.destroy();
+      }
+      if (categoriaRef.current) {
+        categoriaRef.current.destroy();
+      }
+      if (metasRef.current) {
+        metasRef.current.destroy();
+      }
+      if (estoqueRef.current) {
+        estoqueRef.current.destroy();
+      }
+    };
+  }, []);
+
   return (
-    <Layout>
-      <StyledContainer>
-        {alert.show && (
-          <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
-            {alert.message}
-          </Alert>
-        )}
+    <StyledContainer>
+      {alert.show && (
+        <Alert variant={alert.variant} onClose={() => setAlert({ ...alert, show: false })} dismissible>
+          {alert.message}
+        </Alert>
+      )}
 
-        <StyledRow className="mb-4">
-          <Col>
-            <h2>Dashboard</h2>
-          </Col>
-          <Col xs="auto">
-            <Form>
-              <StyledDatePicker
-                selected={startDate}
-                onChange={date => setStartDate(date)}
-                selectsStart
-                startDate={startDate}
-                endDate={endDate}
-                className="form-control"
-              />
-              <StyledDatePicker
-                selected={endDate}
-                onChange={date => setEndDate(date)}
-                selectsEnd
-                startDate={startDate}
-                endDate={endDate}
-                minDate={startDate}
-                className="form-control"
-              />
-              <StyledButton variant="primary" onClick={fetchData} disabled={isLoading}>
-                {isLoading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <><FontAwesomeIcon icon={faSync} className="mr-2" /> Atualizar Dados</>
-                )}
-              </StyledButton>
-              <StyledButton variant="secondary" onClick={() => setShowReportModal(true)}>
-                <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
-                Ver Relatório Completo
-              </StyledButton>
-            </Form>
-          </Col>
-        </StyledRow>
+      <StyledRow className="mb-4">
+        <Col>
+          <h2>Dashboard</h2>
+        </Col>
+        <Col xs="auto">
+          <Form>
+            <StyledDatePicker
+              selected={startDate}
+              onChange={date => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              className="form-control"
+            />
+            <StyledDatePicker
+              selected={endDate}
+              onChange={date => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              className="form-control"
+            />
+            <StyledButton variant="primary" onClick={fetchData} disabled={isLoading}>
+              {isLoading ? (
+                <Spinner animation="border" size="sm" />
+              ) : (
+                <><FontAwesomeIcon icon={faSync} className="mr-2" /> Atualizar Dados</>
+              )}
+            </StyledButton>
+            <StyledButton variant="secondary" onClick={() => setShowReportModal(true)}>
+              <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
+              Ver Relatório Completo
+            </StyledButton>
+          </Form>
+        </Col>
+      </StyledRow>
 
-        {renderResumoFinanceiro()}
-        {renderGraficos()}
-        {renderTransacoesRecentes()}
-        {renderReportModal()}
-      </StyledContainer>
-    </Layout>
+      {renderResumoFinanceiro()}
+      {renderGraficos()}
+      {renderTransacoesRecentes()}
+      {renderReportModal()}
+    </StyledContainer>
   );
 };
 

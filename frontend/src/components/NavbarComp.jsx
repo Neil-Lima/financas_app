@@ -2,7 +2,7 @@ import React from 'react';
 import { Navbar, Nav, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBell, faCommentDots, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
-import { useTheme } from '../context/ThemeContext';
+import { useTheme } from '../shared/contexts/ThemeContext';
 
 const NavbarComp = () => {
   const { isDarkMode, toggleTheme } = useTheme();

@@ -20,30 +20,10 @@ import {
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
 import { Bar } from "react-chartjs-2";
 import Layout from "../layout/Layout";
 import axios from "axios";
-import { useTheme } from "../context/ThemeContext";
-
-ChartJS.register(
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import { useTheme } from "../shared/contexts/ThemeContext";
 
 const StyledContainer = styled(Container)`
   padding: 20px;
@@ -297,328 +277,326 @@ const ParcelamentosPage = () => {
   };
 
   return (
-    <Layout>
-      <StyledContainer fluid>
-        {alert.show && (
-          <Alert
-            variant={alert.variant}
-            onClose={() => setAlert({ ...alert, show: false })}
-            dismissible
-          >
-            {alert.message}
-          </Alert>
-        )}
-
-        <Row className="mb-4">
-          <Col>
-            <h2>Parcelamentos</h2>
-          </Col>
-        </Row>
-
-        <Row className="mb-4">
-          <Col>
-            <StyledCard isDarkMode={isDarkMode}>
-              <Card.Body>
-                <Card.Title>Novo Parcelamento</Card.Title>
-                <ResponsiveForm onSubmit={handleSubmit}>
-                  <Row>
-                    <ResponsiveCol xs={12} md={3}>
-                      <Form.Group>
-                        <Form.Label>Descrição</Form.Label>
-                        <Form.Control
-                          type="text"
-                          name="descricao"
-                          value={newParcelamento.descricao}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </Form.Group>
-                    </ResponsiveCol>
-                    <ResponsiveCol xs={12} md={2}>
-                      <Form.Group>
-                        <Form.Label>Valor Total</Form.Label>
-                        <Form.Control
-                          type="number"
-                          name="valorTotal"
-                          value={newParcelamento.valorTotal}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </Form.Group>
-                    </ResponsiveCol>
-                    <ResponsiveCol xs={12} md={2}>
-                      <Form.Group>
-                        <Form.Label>Número de Parcelas</Form.Label>
-                        <Form.Control
-                          type="number"
-                          name="numeroParcelas"
-                          value={newParcelamento.numeroParcelas}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </Form.Group>
-                    </ResponsiveCol>
-                    <ResponsiveCol xs={12} md={2}>
-                      <Form.Group>
-                        <Form.Label>Data de Início</Form.Label>
-                        <Form.Control
-                          type="date"
-                          name="dataInicio"
-                          value={newParcelamento.dataInicio}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </Form.Group>
-                    </ResponsiveCol>
-                    <ResponsiveCol xs={12} md={3}>
-                      <Form.Group>
-                        <Form.Label>Categoria</Form.Label>
-                        <Form.Control
-                          as="select"
-                          name="categoria"
-                          value={newParcelamento.categoria}
-                          onChange={handleInputChange}
-                          required
-                        >
-                          <option value="">Selecione uma categoria</option>
-                          {categorias.map((categoria) => (
-                            <option key={categoria._id} value={categoria._id}>
-                              {categoria.nome}
-                            </option>
-                          ))}
-                        </Form.Control>
-                      </Form.Group>
-                    </ResponsiveCol>
-                  </Row>
-                  <ResponsiveButton
-                    variant="primary"
-                    type="submit"
-                    className="mt-3"
-                  >
-                    <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                    Adicionar Parcelamento
-                  </ResponsiveButton>
-                </ResponsiveForm>
-              </Card.Body>
-            </StyledCard>
-          </Col>
-        </Row>
-
-        <Row className="mb-4">
-          <Col>
-            <StyledCard isDarkMode={isDarkMode}>
-              <Card.Body>
-                <Card.Title>Visão Geral de Parcelamentos</Card.Title>
-                <ChartContainer>
-                  <Bar data={chartData} options={chartOptions} />
-                </ChartContainer>
-              </Card.Body>
-            </StyledCard>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col>
-            <StyledCard isDarkMode={isDarkMode}>
-              <Card.Body>
-                <Card.Title>Lista de Parcelamentos</Card.Title>
-                <div className="table-responsive">
-                  <StyledTable
-                    striped
-                    bordered
-                    hover
-                    variant={isDarkMode ? "dark" : "light"}
-                  >
-                    <thead>
-                      <tr>
-                        <th>Descrição</th>
-                        <th>Valor Total</th>
-                        <th>Parcelas</th>
-                        <th>Data de Início</th>
-                        <th>Categoria</th>
-                        <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {parcelamentos.map((parcelamento) => (
-                        <tr key={parcelamento._id}>
-                          <td>
-                            {editingId === parcelamento._id ? (
-                              <Form.Control
-                                type="text"
-                                name="descricao"
-                                value={editedParcelamento.descricao}
-                                onChange={handleEditChange}
-                              />
-                            ) : (
-                              parcelamento.descricao
-                            )}
-                          </td>
-                          <td>
-                            {editingId === parcelamento._id ? (
-                              <Form.Control
-                                type="number"
-                                name="valorTotal"
-                                value={editedParcelamento.valorTotal}
-                                onChange={handleEditChange}
-                              />
-                            ) : (
-                              `R$ ${parcelamento.valorTotal.toFixed(2)}`
-                            )}
-                          </td>
-                          <td>
-                            {editingId === parcelamento._id ? (
-                              <Form.Control
-                                type="number"
-                                name="numeroParcelas"
-                                value={editedParcelamento.numeroParcelas}
-                                onChange={handleEditChange}
-                              />
-                            ) : (
-                              parcelamento.numeroParcelas
-                            )}
-                          </td>
-                          <td>
-                            {editingId === parcelamento._id ? (
-                              <Form.Control
-                                type="date"
-                                name="dataInicio"
-                                value={editedParcelamento.dataInicio}
-                                onChange={handleEditChange}
-                              />
-                            ) : (
-                              new Date(
-                                parcelamento.dataInicio
-                              ).toLocaleDateString()
-                            )}
-                          </td>
-                          <td>
-                            {editingId === parcelamento._id ? (
-                              <Form.Control
-                                as="select"
-                                name="categoria"
-                                value={editedParcelamento.categoria}
-                                onChange={handleEditChange}
-                              >
-                                {categorias.map((categoria) => (
-                                  <option
-                                    key={categoria._id}
-                                    value={categoria._id}
-                                  >
-                                    {categoria.nome}
-                                  </option>
-                                ))}
-                              </Form.Control>
-                            ) : (
-                              parcelamento.categoria.nome
-                            )}
-                          </td>
-                          <td>
-                            {editingId === parcelamento._id ? (
-                              <>
-                                <ResponsiveButton
-                                  variant="success"
-                                  size="sm"
-                                  onClick={handleSaveEdit}
-                                >
-                                  <FontAwesomeIcon icon={faCheck} />
-                                </ResponsiveButton>
-                                <ResponsiveButton
-                                  variant="secondary"
-                                  size="sm"
-                                  onClick={() => setEditingId(null)}
-                                  className="ml-2"
-                                >
-                                  <FontAwesomeIcon icon={faTimes} />
-                                </ResponsiveButton>
-                              </>
-                            ) : (
-                              <>
-                                <ResponsiveButton
-                                  variant="outline-primary"
-                                  size="sm"
-                                  onClick={() => handleEdit(parcelamento)}
-                                >
-                                  <FontAwesomeIcon icon={faEdit} />
-                                </ResponsiveButton>
-                                <ResponsiveButton
-                                  variant="outline-danger"
-                                  size="sm"
-                                  onClick={() => handleDelete(parcelamento._id)}
-                                >
-                                  <FontAwesomeIcon icon={faTrash} />
-                                </ResponsiveButton>
-                                <ResponsiveButton
-                                  variant="outline-info"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleShowDetails(parcelamento)
-                                  }
-                                >
-                                  <FontAwesomeIcon icon={faEye} />
-                                </ResponsiveButton>
-                              </>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </StyledTable>
-                </div>
-              </Card.Body>
-            </StyledCard>
-          </Col>
-        </Row>
-
-        <StyledModal
-          show={showDetailsModal}
-          onHide={() => setShowDetailsModal(false)}
-          isDarkMode={isDarkMode}
+    <Container fluid>
+      {alert.show && (
+        <Alert
+          variant={alert.variant}
+          onClose={() => setAlert({ ...alert, show: false })}
+          dismissible
         >
-          <Modal.Header closeButton>
-            <Modal.Title>Detalhes do Parcelamento</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {detailsParcelamento && (
-              <>
-                <p>
-                  <strong>Descrição:</strong> {detailsParcelamento.descricao}
-                </p>
-                <p>
-                  <strong>Valor Total:</strong> R${" "}
-                  {detailsParcelamento.valorTotal.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Número de Parcelas:</strong>{" "}
-                  {detailsParcelamento.numeroParcelas}
-                </p>
-                <p>
-                  <strong>Data de Início:</strong>{" "}
-                  {new Date(
-                    detailsParcelamento.dataInicio
-                  ).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Categoria:</strong>{" "}
-                  {detailsParcelamento.categoria.nome}
-                </p>
-                <p>
-                  <strong>ID:</strong> {detailsParcelamento._id}
-                </p>
-              </>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => setShowDetailsModal(false)}
-            >
-              Fechar
-            </Button>
-          </Modal.Footer>
-        </StyledModal>
-      </StyledContainer>
-    </Layout>
+          {alert.message}
+        </Alert>
+      )}
+
+      <Row className="mb-4">
+        <Col>
+          <h2>Parcelamentos</h2>
+        </Col>
+      </Row>
+
+      <Row className="mb-4">
+        <Col>
+          <StyledCard isDarkMode={isDarkMode}>
+            <Card.Body>
+              <Card.Title>Novo Parcelamento</Card.Title>
+              <ResponsiveForm onSubmit={handleSubmit}>
+                <Row>
+                  <ResponsiveCol xs={12} md={3}>
+                    <Form.Group>
+                      <Form.Label>Descrição</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="descricao"
+                        value={newParcelamento.descricao}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </Form.Group>
+                  </ResponsiveCol>
+                  <ResponsiveCol xs={12} md={2}>
+                    <Form.Group>
+                      <Form.Label>Valor Total</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="valorTotal"
+                        value={newParcelamento.valorTotal}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </Form.Group>
+                  </ResponsiveCol>
+                  <ResponsiveCol xs={12} md={2}>
+                    <Form.Group>
+                      <Form.Label>Número de Parcelas</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="numeroParcelas"
+                        value={newParcelamento.numeroParcelas}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </Form.Group>
+                  </ResponsiveCol>
+                  <ResponsiveCol xs={12} md={2}>
+                    <Form.Group>
+                      <Form.Label>Data de Início</Form.Label>
+                      <Form.Control
+                        type="date"
+                        name="dataInicio"
+                        value={newParcelamento.dataInicio}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </Form.Group>
+                  </ResponsiveCol>
+                  <ResponsiveCol xs={12} md={3}>
+                    <Form.Group>
+                      <Form.Label>Categoria</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="categoria"
+                        value={newParcelamento.categoria}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Selecione uma categoria</option>
+                        {categorias.map((categoria) => (
+                          <option key={categoria._id} value={categoria._id}>
+                            {categoria.nome}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+                  </ResponsiveCol>
+                </Row>
+                <ResponsiveButton
+                  variant="primary"
+                  type="submit"
+                  className="mt-3"
+                >
+                  <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                  Adicionar Parcelamento
+                </ResponsiveButton>
+              </ResponsiveForm>
+            </Card.Body>
+          </StyledCard>
+        </Col>
+      </Row>
+
+      <Row className="mb-4">
+        <Col>
+          <StyledCard isDarkMode={isDarkMode}>
+            <Card.Body>
+              <Card.Title>Visão Geral de Parcelamentos</Card.Title>
+              <ChartContainer>
+                <Bar data={chartData} options={chartOptions} />
+              </ChartContainer>
+            </Card.Body>
+          </StyledCard>
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+          <StyledCard isDarkMode={isDarkMode}>
+            <Card.Body>
+              <Card.Title>Lista de Parcelamentos</Card.Title>
+              <div className="table-responsive">
+                <StyledTable
+                  striped
+                  bordered
+                  hover
+                  variant={isDarkMode ? "dark" : "light"}
+                >
+                  <thead>
+                    <tr>
+                      <th>Descrição</th>
+                      <th>Valor Total</th>
+                      <th>Parcelas</th>
+                      <th>Data de Início</th>
+                      <th>Categoria</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {parcelamentos.map((parcelamento) => (
+                      <tr key={parcelamento._id}>
+                        <td>
+                          {editingId === parcelamento._id ? (
+                            <Form.Control
+                              type="text"
+                              name="descricao"
+                              value={editedParcelamento.descricao}
+                              onChange={handleEditChange}
+                            />
+                          ) : (
+                            parcelamento.descricao
+                          )}
+                        </td>
+                        <td>
+                          {editingId === parcelamento._id ? (
+                            <Form.Control
+                              type="number"
+                              name="valorTotal"
+                              value={editedParcelamento.valorTotal}
+                              onChange={handleEditChange}
+                            />
+                          ) : (
+                            `R$ ${parcelamento.valorTotal.toFixed(2)}`
+                          )}
+                        </td>
+                        <td>
+                          {editingId === parcelamento._id ? (
+                            <Form.Control
+                              type="number"
+                              name="numeroParcelas"
+                              value={editedParcelamento.numeroParcelas}
+                              onChange={handleEditChange}
+                            />
+                          ) : (
+                            parcelamento.numeroParcelas
+                          )}
+                        </td>
+                        <td>
+                          {editingId === parcelamento._id ? (
+                            <Form.Control
+                              type="date"
+                              name="dataInicio"
+                              value={editedParcelamento.dataInicio}
+                              onChange={handleEditChange}
+                            />
+                          ) : (
+                            new Date(
+                              parcelamento.dataInicio
+                            ).toLocaleDateString()
+                          )}
+                        </td>
+                        <td>
+                          {editingId === parcelamento._id ? (
+                            <Form.Control
+                              as="select"
+                              name="categoria"
+                              value={editedParcelamento.categoria}
+                              onChange={handleEditChange}
+                            >
+                              {categorias.map((categoria) => (
+                                <option
+                                  key={categoria._id}
+                                  value={categoria._id}
+                                >
+                                  {categoria.nome}
+                                </option>
+                              ))}
+                            </Form.Control>
+                          ) : (
+                            parcelamento.categoria.nome
+                          )}
+                        </td>
+                        <td>
+                          {editingId === parcelamento._id ? (
+                            <>
+                              <ResponsiveButton
+                                variant="success"
+                                size="sm"
+                                onClick={handleSaveEdit}
+                              >
+                                <FontAwesomeIcon icon={faCheck} />
+                              </ResponsiveButton>
+                              <ResponsiveButton
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setEditingId(null)}
+                                className="ml-2"
+                              >
+                                <FontAwesomeIcon icon={faTimes} />
+                              </ResponsiveButton>
+                            </>
+                          ) : (
+                            <>
+                              <ResponsiveButton
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => handleEdit(parcelamento)}
+                              >
+                                <FontAwesomeIcon icon={faEdit} />
+                              </ResponsiveButton>
+                              <ResponsiveButton
+                                variant="outline-danger"
+                                size="sm"
+                                onClick={() => handleDelete(parcelamento._id)}
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </ResponsiveButton>
+                              <ResponsiveButton
+                                variant="outline-info"
+                                size="sm"
+                                onClick={() =>
+                                  handleShowDetails(parcelamento)
+                                }
+                              >
+                                <FontAwesomeIcon icon={faEye} />
+                              </ResponsiveButton>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </StyledTable>
+              </div>
+            </Card.Body>
+          </StyledCard>
+        </Col>
+      </Row>
+
+      <StyledModal
+        show={showDetailsModal}
+        onHide={() => setShowDetailsModal(false)}
+        isDarkMode={isDarkMode}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Detalhes do Parcelamento</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {detailsParcelamento && (
+            <>
+              <p>
+                <strong>Descrição:</strong> {detailsParcelamento.descricao}
+              </p>
+              <p>
+                <strong>Valor Total:</strong> R${" "}
+                {detailsParcelamento.valorTotal.toFixed(2)}
+              </p>
+              <p>
+                <strong>Número de Parcelas:</strong>{" "}
+                {detailsParcelamento.numeroParcelas}
+              </p>
+              <p>
+                <strong>Data de Início:</strong>{" "}
+                {new Date(
+                  detailsParcelamento.dataInicio
+                ).toLocaleDateString()}
+              </p>
+              <p>
+                <strong>Categoria:</strong>{" "}
+                {detailsParcelamento.categoria.nome}
+              </p>
+              <p>
+                <strong>ID:</strong> {detailsParcelamento._id}
+              </p>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowDetailsModal(false)}
+          >
+            Fechar
+          </Button>
+        </Modal.Footer>
+      </StyledModal>
+    </Container>
   );
 };
 

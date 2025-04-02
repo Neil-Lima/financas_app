@@ -19,7 +19,7 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import styled from "styled-components";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../shared/contexts/ThemeContext";
 
 const Sidebar = styled.div`
   background: ${(props) =>
