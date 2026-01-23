@@ -1,0 +1,396 @@
+## ESTRUTURA DE DIRETÓRIOS E ARQUITETURA FRONTEND
+
+### DIRETÓRIOS GLOBAIS:
+
+**id/** - Serve para lidar com IDs
+
+**api/** - Contém as URLs da API para serem usadas
+
+**crudServices/** - Contém as requisições globais para consumir a API
+
+**types/** - Contém as definições de tipos TypeScript para toda a aplicação
+
+### FLUXO DE COMUNICAÇÃO:
+
+```
+CRUDSERVICES (Global) → SERVICES (Componente) → UTILS (Componente) → COMPONENT
+```
+
+**REGRAS IMPORTANTES:**
+- ❌ NUNCA usar crudServices diretamente no utils
+- ❌ NUNCA usar api/ ou id/ diretamente (crudServices já os inclui)
+- ✅ crudServices → services → utils → component
+- ✅ Services do componente consome crudServices global
+- ✅ Utils consome services do próprio componente
+- ✅ Component consome utils do próprio componente
+
+### ESTRUTURA PADRÃO DE CADA DIRETÓRIO:
+
+```
+NomeDoDiretorio/
+├── components/
+│   └── NomeDoDiretorioComp.jsx
+├── utils/
+│   └── NomeDoDiretorioUtils.jsx
+├── styles/
+│   └── NomeDoDiretorioStyles.jsx
+└── services/
+    └── NomeDoDiretorioServices.jsx
+```
+
+### RESPONSABILIDADES:
+
+**COMPONENT (.jsx):**
+- ✅ Apenas renderização e JSX
+- ❌ SEM lógicas, estados, arrays, effects, estilos
+- ✅ Consome apenas UTILS
+
+**UTILS (.jsx):**
+- ✅ Estados, effects, lógicas de negócio
+- ✅ Hooks customizados (useQuery, useMutation)
+- ✅ TanStack Query para gerenciamento de estado
+- ✅ Consome apenas SERVICES
+
+**SERVICES (.jsx):**
+- ✅ Requisições HTTP
+- ✅ Consome crudServices global
+- ✅ Transformação de dados da API
+
+**STYLES (.jsx):**
+- ✅ Styled-components
+- ✅ Estilos e temas
+- ✅ Animações e transições
+
+### SISTEMA DE TEMA:
+
+**Como aplicar o tema nos componentes:**
+```jsx
+// 1. Importar useTheme
+import { useTheme } from '@/context/theme/ThemeContext';
+
+// 2. No component, passar theme para styled-component
+const { theme } = useTheme();
+<StyledComponent theme={theme}>
+
+// 3. No styled-component, usar props.theme
+background: ${props => `linear-gradient(${props.theme.gradientDirection}, ${props.theme.primaryColor}, ${props.theme.secondaryColor})`};
+box-shadow: ${props => props.theme.boxShadow};
+border-radius: ${props => props.theme.borderRadius};
+```
+
+**Padrão visual dos cards:**
+- Gradiente diagonal (45deg) azul escuro → azul médio
+- Backdrop blur para glassmorphism
+- Bordas arredondadas (20px)
+- Sombras profundas para elevação
+- Transparências para sobreposições
+- Transições suaves (0.3s)
+
+### TESTES E2E COM CYPRESS:
+
+**OBJETIVO:** Testar TODOS os componentes do frontend com backend REAL, sem mocks.
+
+**ESTRUTURA PADRÃO:**
+```
+components/
+└── [modulo]/          (ex: groups, events, posts, profile)
+    └── [componente]/  (ex: grid, detail, header, card)
+        ├── components/
+        │   └── [Nome]Comp.jsx
+        ├── utils/
+        ├── services/
+        ├── styles/
+        └── test/
+            └── [componente].cy.js  (ex: groups-grid.cy.js)
+```
+
+**TEMPLATE DE TESTE (COPIAR E ADAPTAR):**
+```javascript
+describe('[Componente] - E2E REAL (BACKEND REAL)', () => {
+  
+  before(() => {
+    // 1. AUTENTICAÇÃO - Injetar token JWT VÁLIDO
+    cy.visit('http://localhost:3000');
+    cy.window().then((win) => {
+      win.localStorage.setItem('token', 'SEU_TOKEN_JWT_VALIDO_AQUI');
+      win.localStorage.setItem('user', JSON.stringify({
+        id: 'USER_ID',
+        email: 'email@example.com',
+        nome: 'Nome Usuario'
+      }));
+    });
+    cy.log('✅ Token JWT válido injetado');
+  });
+
+  beforeEach(() => {
+    // 2. INTERCEPTAR API - Aguardar resposta antes de testar
+    cy.intercept('GET', '**/sua-api-endpoint**').as('getData');
+    
+    // 3. VISITAR PÁGINA
+    cy.visit('http://localhost:3000/sua-rota', { timeout: 30000 });
+    
+    // 4. AGUARDAR API RESPONDER
+    cy.wait('@getData', { timeout: 30000 }).then(() => {
+      cy.log('✅ API respondeu');
+    });
+    
+    // 5. AGUARDAR RENDERIZAÇÃO (especialmente dynamic imports)
+    cy.get('body').should('be.visible');
+    cy.wait(3000);
+  });
+
+  it('TESTE 1: Verifica carregamento do componente principal', () => {
+    cy.get('[data-testid="component-container"]', { timeout: 30000 })
+      .should('be.visible');
+    cy.log('✅ Componente carregado');
+  });
+
+  it('TESTE 2: Verifica interação com elementos', () => {
+    cy.get('[data-testid="action-button"]').click();
+    cy.wait(2000);
+    cy.get('[data-testid="result-element"]').should('be.visible');
+  });
+
+  // Adicionar mais testes conforme necessário
+});
+```
+
+**REGRAS OBRIGATÓRIAS:**
+
+1. **data-testid em TODOS os componentes:**
+```jsx
+// NO COMPONENT:
+<MainContainer data-testid="[modulo]-container">
+<Card data-testid={`[modulo]-card-${id}`}>
+<Button data-testid="[acao]-button">
+<Input data-testid="[campo]-input">
+<Modal data-testid="[nome]-modal">
+```
+
+2. **cy.intercept APENAS para aguardar, NUNCA mockar:**
+```javascript
+// ✅ CORRETO - Aguarda API real
+cy.intercept('GET', '**/api/groups').as('getGroups');
+cy.wait('@getGroups', { timeout: 30000 });
+
+// ❌ ERRADO - Mockar resposta
+cy.intercept('GET', '**/api/groups', { fixture: 'groups.json' });
+```
+
+3. **Testes tolerantes (se elemento pode não existir):**
+```javascript
+cy.get('body').then($body => {
+  if ($body.find('[data-testid="elemento"]').length > 0) {
+    cy.get('[data-testid="elemento"]').click();
+    cy.log('✅ Elemento encontrado e clicado');
+  } else {
+    cy.log('⚠️ Elemento não disponível');
+  }
+});
+```
+
+4. **Timeouts generosos (dynamic imports demoram):**
+```javascript
+cy.visit('...', { timeout: 30000 });           // 30s
+cy.wait('@api', { timeout: 30000 });           // 30s
+cy.get('[data-testid]', { timeout: 30000 });   // 30s
+cy.wait(3000);  // Após API para renderização
+```
+
+5. **Backend REAL rodando:**
+```bash
+# Terminal 1 - Backend
+cd backend
+npm run start:dev
+
+# Terminal 2 - Frontend
+cd frontend
+npm run dev
+
+# Terminal 3 - Cypress
+cd frontend
+npx cypress run --spec "src/components/[modulo]/[componente]/test/*.cy.js" --browser chrome
+```
+
+6. **Obter token JWT válido:**
+- Fazer login manualmente na aplicação
+- Abrir DevTools > Application > Local Storage
+- Copiar valor do `token`
+- Colar no teste (linha do localStorage.setItem)
+- Token expira - renovar quando necessário
+
+**COMANDOS ÚTEIS:**
+```bash
+# Rodar um teste específico
+npx cypress run --spec "src/components/groups/grid/test/groups-grid.cy.js" --browser chrome
+
+# Rodar todos os testes de um módulo
+npx cypress run --spec "src/components/groups/**/test/*.cy.js" --browser chrome
+
+# Modo interativo (ver testes rodando)
+npx cypress open
+
+# Ver screenshots de falhas
+cd cypress/screenshots
+```
+
+**CHECKLIST ANTES DE COMMITAR TESTES:**
+- [ ] Backend rodando na porta 5000
+- [ ] Token JWT válido (não expirado)
+- [ ] data-testid em todos os elementos testáveis
+- [ ] cy.intercept para aguardar APIs (não mockar)
+- [ ] Timeouts de 30s em cy.wait e cy.get
+- [ ] cy.wait(3000) após cy.wait('@api')
+- [ ] Testes tolerantes a elementos opcionais
+- [ ] Todos os testes passando (100%)
+
+### SISTEMA DE TIPOS TYPESCRIPT:
+
+**PASTA types/**
+```
+types/
+├── index.ts                    # Exporta todos os tipos
+├── api.types.ts               # Tipos de requisições/respostas da API
+├── components.types.ts        # Tipos de props dos componentes
+├── models.types.ts            # Tipos de modelos de dados (User, Post, Comment, etc)
+├── hooks.types.ts             # Tipos de hooks customizados
+└── services.types.ts          # Tipos de serviços
+```
+
+**REGRAS DE TIPAGEM:**
+
+1. **Props de Componentes:**
+```typescript
+// types/components.types.ts
+export interface CommentFormProps {
+  contentType: 'posts' | 'videos' | 'gallery';
+  contentId: string;
+  onAddComment: (comment: Comment) => void;
+  placeholder?: string;
+}
+
+// No componente:
+const CommentFormComp: React.FC<CommentFormProps> = ({ 
+  contentType = 'posts', 
+  contentId, 
+  onAddComment, 
+  placeholder = "Adicione um comentário..." 
+}) => {
+  // ...
+}
+```
+
+2. **Modelos de Dados:**
+```typescript
+// types/models.types.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  bio?: string;
+}
+
+export interface Post {
+  id: string;
+  content: string;
+  author: User;
+  createdAt: Date;
+  likes: number;
+  comments: Comment[];
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  author: User;
+  createdAt: Date;
+  likes: number;
+}
+```
+
+3. **Respostas da API:**
+```typescript
+// types/api.types.ts
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  error?: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+```
+
+4. **Hooks Customizados:**
+```typescript
+// types/hooks.types.ts
+export interface UseQueryOptions {
+  enabled?: boolean;
+  staleTime?: number;
+  cacheTime?: number;
+}
+
+export interface UseMutationOptions {
+  onSuccess?: (data: any) => void;
+  onError?: (error: Error) => void;
+}
+```
+
+5. **Services:**
+```typescript
+// types/services.types.ts
+export interface ICommentService {
+  getComments(contentId: string): Promise<Comment[]>;
+  addComment(contentId: string, content: string): Promise<Comment>;
+  deleteComment(commentId: string): Promise<void>;
+  updateComment(commentId: string, content: string): Promise<Comment>;
+}
+```
+
+**COMO USAR:**
+```typescript
+// Importar tipos
+import type { CommentFormProps, Comment, Post } from '@/types';
+
+// Usar em componentes
+const CommentFormComp: React.FC<CommentFormProps> = (props) => {
+  // ...
+}
+
+// Usar em services
+const addComment = async (comment: Comment): Promise<ApiResponse<Comment>> => {
+  // ...
+}
+
+// Usar em hooks
+const useComments = (contentId: string, options?: UseQueryOptions) => {
+  // ...
+}
+```
+
+**BOAS PRÁTICAS:**
+- ✅ Usar `interface` para objetos, `type` para unions/primitivos
+- ✅ Exportar tipos do `index.ts` para facilitar imports
+- ✅ Usar `type` imports quando possível: `import type { ... }`
+- ✅ Manter tipos próximos ao seu uso (models, components, api)
+- ✅ Documentar tipos complexos com comentários JSDoc
+- ❌ NUNCA usar `any` - sempre tipificar explicitamente
+- ❌ NUNCA deixar props sem tipos
+
+### REGRAS GERAIS:
+
+- 📁 **UM ARQUIVO POR DIRETÓRIO** - Cada arquivo deve ter seu próprio diretório
+- 🔄 **TanStack Query** - OBRIGATÓRIO para requisições HTTP, cache e sincronização de dados
+- 🎨 **Tema consistente** - Sempre aplicar o sistema de tema nos styled-components
+- 📱 **Responsividade** - Sempre incluir breakpoints mobile
+- ⚡ **Performance** - Lazy loading e otimizações quando necessário
+- 🧪 **Testes E2E** - Cypress com backend real, sem mocks, data-testid obrigatório
+- 📘 **TypeScript** - Sempre tipificar componentes, props, hooks e serviços
+
+observação: as funcionalidades que funcionam do deskitop devem funcionar identicamente no mobile

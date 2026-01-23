@@ -1,0 +1,33 @@
+🔍 Verificando disponibilidade do servidor local...
+api.js:81 ⚠️ Servidor local não está disponível
+api.js:95 🌐 Usando backend de produção.
+api.js:120 🔌 API configurada para: https://backend-r3w0bkbl2-neil-limas-projects.vercel.app/api
+(index):1 Access to fetch at 'https://backend-r3w0bkbl2-neil-limas-projects.vercel.app/api/health' from origin 'https://financasappproject.netlify.app' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+backend-r3w0bkbl2-neil-limas-projects.vercel.app/api/health:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+api.js:156 📡 Requisição API: POST /usuarios/register Object
+(index):1 Access to XMLHttpRequest at 'https://backend-r3w0bkbl2-neil-limas-projects.vercel.app/api/usuarios/register' from origin 'https://financasappproject.netlify.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+backend-r3w0bkbl2-neil-limas-projects.vercel.app/api/usuarios/register:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+api.js:156 📡 Requisição API: POST /usuarios/register {dataType: 'object'}
+(index):1 Access to XMLHttpRequest at 'https://backend-r3w0bkbl2-neil-limas-projects.vercel.app/api/usuarios/register' from origin 'https://financasappproject.netlify.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+crudService.js:341  POST https://backend-r3w0bkbl2-neil-limas-projects.vercel.app/api/usuarios/register net::ERR_FAILED
+(anonymous) @ xhr.js:220
+e.1989.e.exports @ xhr.js:16
+e.4395.e.exports @ dispatchRequest.js:56
+Promise.then
+e.8938.d.request @ Axios.js:89
+(anonymous) @ Axios.js:144
+e.6973.e.exports @ bind.js:9
+s_ @ crudService.js:341
+sR @ LoginServices.js:5
+(anonymous) @ LoginUtils.jsx:41
+Ie @ react-dom.production.min.js:54
+Be @ react-dom.production.min.js:54
+(anonymous) @ react-dom.production.min.js:55
+Lr @ react-dom.production.min.js:105
+Fr @ react-dom.production.min.js:106
+(anonymous) @ react-dom.production.min.js:117
+lc @ react-dom.production.min.js:273
+Pe @ react-dom.production.min.js:52
+Vr @ react-dom.production.min.js:109
+$t @ react-dom.production.min.js:74
+Ut @ react-dom.production.min.js:73Understand this error

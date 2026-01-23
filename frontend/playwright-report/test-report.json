@@ -1,0 +1,807 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\nexus\\Documents\\GitHub\\financas_app\\frontend\\playwright.config.mjs",
+    "rootDir": "C:/Users/nexus/Documents/GitHub/financas_app/frontend/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/test-report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/nexus/Documents/GitHub/financas_app/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/nexus/Documents/GitHub/financas_app/frontend/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "categorias.real.spec.mjs",
+      "file": "categorias.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Categorias (E2E - API real)",
+          "file": "categorias.real.spec.mjs",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "CRUD usando backend real",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8486,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:03:59.055Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dda76d8d283d8ca4e774-e3ec21ec32290ef563a8",
+              "file": "categorias.real.spec.mjs",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "contas.real.spec.mjs",
+      "file": "contas.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Contas (E2E - API real)",
+          "file": "contas.real.spec.mjs",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10430,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:04:08.052Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "1226cb21eddfd0fc04ad-11ab6ac64ab76812e61a",
+              "file": "contas.real.spec.mjs",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "contasAPagar.real.spec.mjs",
+      "file": "contasAPagar.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Contas a Pagar (E2E - API real)",
+          "file": "contasAPagar.real.spec.mjs",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8269,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:04:18.553Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "cc123dd0ae4fae6a4d76-df85529e7afa91cf7e69",
+              "file": "contasAPagar.real.spec.mjs",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "despesas.real.spec.mjs",
+      "file": "despesas.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Despesas (E2E - API real)",
+          "file": "despesas.real.spec.mjs",
+          "line": 66,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12597,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:04:26.909Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "95fb833a9a99288a707c-b78a7507ec0a92d59ddd",
+              "file": "despesas.real.spec.mjs",
+              "line": 67,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "dividas.real.spec.mjs",
+      "file": "dividas.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Dívidas (E2E - API real)",
+          "file": "dividas.real.spec.mjs",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "carrega resumo e lista de próximos vencimentos",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5964,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:04:39.563Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "3d9d0069fc3d938ff0e0-40d96ea52085ebbcb2d7",
+              "file": "dividas.real.spec.mjs",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "estoque.real.spec.mjs",
+      "file": "estoque.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Estoque (E2E - API real)",
+          "file": "estoque.real.spec.mjs",
+          "line": 55,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 11332,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:04:45.577Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5d5d2b753766b5b95267-23602363340107a2cc1f",
+              "file": "estoque.real.spec.mjs",
+              "line": 56,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "financiamentos.real.spec.mjs",
+      "file": "financiamentos.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Financiamentos (E2E - API real)",
+          "file": "financiamentos.real.spec.mjs",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10712,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:04:56.954Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "65ba34d2e767ad5392dc-a3e2982f03fba9486762",
+              "file": "financiamentos.real.spec.mjs",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "metas.real.spec.mjs",
+      "file": "metas.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Metas (E2E - API real)",
+          "file": "metas.real.spec.mjs",
+          "line": 57,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10347,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:05:07.717Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2d869283b8f70d333764-6057cb381fb6e9815b61",
+              "file": "metas.real.spec.mjs",
+              "line": 58,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "orcamentos.real.spec.mjs",
+      "file": "orcamentos.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Orçamentos (E2E - API real)",
+          "file": "orcamentos.real.spec.mjs",
+          "line": 38,
+          "column": 6,
+          "specs": [
+            {
+              "title": "fluxo completo usando backend real (CRUD + comparar anual + detalhes)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12442,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:3000/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:3000/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos/comparar-anual?anoAtual=2026&anoAnterior=2025\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos/comparar-anual?anoAtual=2026&anoAnterior=2025\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request POST http://localhost:5000/api/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m201\u001b[39m POST http://localhost:5000/api/orcamentos\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request PATCH http://localhost:5000/api/orcamentos/69610b27be27e7922d588aa4\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m PATCH http://localhost:5000/api/orcamentos/69610b27be27e7922d588aa4\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request DELETE http://localhost:5000/api/orcamentos/69610b27be27e7922d588aa4\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m204\u001b[39m DELETE http://localhost:5000/api/orcamentos/69610b27be27e7922d588aa4\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] request GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        },
+                        {
+                          "text": "[orcamentos.real] response \u001b[33m200\u001b[39m GET http://localhost:5000/api/orcamentos?ano=2026\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:05:18.116Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "109df1a8f98f7994fcd8-96b9f0d92b69efce3c31",
+              "file": "orcamentos.real.spec.mjs",
+              "line": 39,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "parcelamentos.real.spec.mjs",
+      "file": "parcelamentos.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Parcelamentos (E2E - API real)",
+          "file": "parcelamentos.real.spec.mjs",
+          "line": 55,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10350,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:05:30.599Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "744c13355cd3eb868b40-c4ee199198bf0ccd7252",
+              "file": "parcelamentos.real.spec.mjs",
+              "line": 56,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "relatorios.real.spec.mjs",
+      "file": "relatorios.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Relatórios (E2E - API real)",
+          "file": "relatorios.real.spec.mjs",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "gerar relatório + baixar PDF",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6752,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:05:40.990Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "9551388285e86cc105c9-53c46bc26d3f444ef53b",
+              "file": "relatorios.real.spec.mjs",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "transacoes.real.spec.mjs",
+      "file": "transacoes.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Transações (E2E - API real)",
+          "file": "transacoes.real.spec.mjs",
+          "line": 38,
+          "column": 6,
+          "specs": [
+            {
+              "title": "criar + editar + detalhes + excluir",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12293,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:05:47.803Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c1f52f927586593e6bfa-4065870a999e44b8c024",
+              "file": "transacoes.real.spec.mjs",
+              "line": 39,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "vencimentos.real.spec.mjs",
+      "file": "vencimentos.real.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Vencimentos (E2E - API real)",
+          "file": "vencimentos.real.spec.mjs",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "carrega lista com itens (conta a pagar + parcela + financiamento)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7825,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-01-09T14:06:00.147Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a227ebc478a1f74cfd8-96fcd6c75fecfaec1d15",
+              "file": "vencimentos.real.spec.mjs",
+              "line": 8,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-01-09T14:03:56.633Z",
+    "duration": 132947.745,
+    "expected": 13,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
